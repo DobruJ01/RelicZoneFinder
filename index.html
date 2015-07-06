@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Relic Zone Finder</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+        <script src="https://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/md5.js"></script>
+        <textarea id="savedata" style="width: 100%; height: 100px" onfocus="this.select()" onmouseup="return false"></textarea>
+        <button onclick="main()">Find Relic Zone</button>
+        <p id="result"></p>
+        <p id="item"></p>
+
+<script>
+
+function main() {
+    
+    var data = decodeSaveData();
+    if(!data){
+        return;
+    }
+    if(data.numWorldResets == 0){
+        alert("You need to ascend before getting relics.");
+        return;
+    }
+    var zone_seed = data.items.bonusZoneRoller.seed;
+    var HZE = data.highestFinishedZonePersist;
+    var start_zone = findStartZone(data);
+    var spawn_zone = 0;
+    
+    spawn_zone = getBonusItemZone(start_zone,HZE,zone_seed);
+
+    if(JSON.stringify(data.items.gotAscensionItem) != "false"){
+        document.getElementById("item").innerHTML = "According to the save file, you've already received your relic."; 
+    }
+    document.getElementById("result").innerHTML = "Start Zone: " + (start_zone+1) + "<br>"
+                                                + "Highest Zone: " + HZE + "<br>"
+                                                + "Relic Spawn Zone: " + spawn_zone + "<br>";
+}
+function findStartZone(data)
+{
+    const VISION_RELIC = 6;
+    const IRIS = 30;
+    var the_item;
+    var start_zone = 0;
+    //check for items that increase starting zone
+    for(var i=0;i<4;i++){
+        if(data.items.slots[i+1]){
+            the_item = data.items.items[data.items.slots[i+1]];
+            for (var j=0; j<4; j++) {
+                var str = "bonusType" + j.toString();
+                if(the_item[str] == VISION_RELIC) {
+                    start_zone += the_item["bonus" + j.toString() + "Level"]
+                }
+            }
+        }
+    }
+    //check for Iris
+    if(data.ancients.ancients[IRIS].level) {
+        start_zone += data.ancients.ancients[IRIS].level;
+    }
+    return start_zone;
+}
+function decodeSaveData() 
+{
+//Decode function taken from Rivsoft (http://s3-us-west-2.amazonaws.com/clickerheroes/ancientssoul.html)
+    const ANTI_CHEAT_CODE = "Fe12NAfA3R6z4k0z";
+    const SALT = "af0ik392jrmt0nsfdghy0";
+    var txt = $("#savedata").val();
+
+    if (txt.search(ANTI_CHEAT_CODE) != -1) {
+        var result = txt.split(ANTI_CHEAT_CODE);
+        txt = "";
+        for (var i = 0; i < result[0].length; i += 2) {
+            txt += result[0][i];
+        }
+        if (CryptoJS.MD5(txt + SALT) != result[1]) {
+            alert("Invalid Save File");
+            return;
+        }
+    }
+    return jQuery.parseJSON(atob(txt));
+}
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+function getBonusItemZone(start, HZE, s)
+{
+//rand() % (param2 - param1 + 1) + param1;
+//seed = seed * 16807 % (2147483646 + 1);
+
+    var tt = 0;
+    var seed = 0;
+    var zone = 0;
+    //Dim modder As Double
+    seed = s;
+    tt = Math.ceil(HZE * 0.66);
+    
+    if (tt - start <= Math.ceil(tt * 0.3)) {
+       tt = start + Math.ceil(tt * 0.3);
+    }
+    start = Math.max(99, start);
+    tt = Math.max(101, tt);
+    do {
+        seed = randNum(seed);
+        zone = range(start, tt, seed);
+    }while (zone % 5 == 0);
+    
+    return zone;
+
+}
+function range(start, finish, seed)
+{
+    return seed % (finish - start + 1) + start;
+}
+
+function randNum(seed) {
+    //Dim modder As Double
+    
+    return (seed * 16807) % (2147483646 + 1);
+    //modder = Application.WorksheetFunction.Floor((seed / (2147483646 + 1)), 1) * (2147483646 + 1)
+    //seed = seed - modder
+    
+    //randNum = seed
+}
+</script>
+</body>
+</html>
