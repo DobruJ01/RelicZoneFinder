@@ -8,16 +8,20 @@
     <body>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
         <script src="https://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/md5.js"></script>
-        <textarea id="savedata" style="width: 100%; height: 100px" onfocus="this.select()" onmouseup="return false" placeholder="Paste save file here."></textarea>
+        <textarea id="savedata" style="width: 500px; height: 100px" onfocus="this.select()" onmouseup="return false" placeholder="Paste save file here."></textarea>
+        <br>
         <button onclick="main()">Find Relic Zone</button>
+        <p id="spawnRange"></p>
+        <div id="divResults"></div>
         <p id="result"></p>
         <p id="item"></p>
 
 <script>
 
 function main() {
-    
+    clearResults();
     var data = decodeSaveData();
+    var start_zones = new Array();
     if(!data){
         return;
     }
@@ -25,21 +29,82 @@ function main() {
         alert("You need to ascend before getting relics.");
         return;
     }
+    
     var zone_seed = data.items.bonusZoneRoller.seed;
     var HZE = data.highestFinishedZonePersist;
     var start_zone = findStartZone(data);
     var spawn_zone = 0;
-    
+    var results_table;
     spawn_zone = getBonusItemZone(start_zone,HZE,zone_seed);
-
+    
+    zones = findSeveralStartZones(start_zone,HZE,zone_seed,5);
+    results_table = createTable(data.numWorldResets,zones);
     if(JSON.stringify(data.items.gotAscensionItem) != "false"){
-        document.getElementById("item").innerHTML = "According to the save file, you've already received your relic."; 
+        document.getElementById("item").innerHTML = "According to the save file, you've already received your relic for this ascension."; 
     }else{
         document.getElementById("item").innerHTML = "";
     }
-    document.getElementById("result").innerHTML = "Start Zone: " + (start_zone+1) + "<br>"
-                                                + "Highest Zone: " + HZE + "<br>"
-                                                + "Relic Spawn Zone: " + spawn_zone + "<br>";
+    $('#divResults').append(results_table);
+    document.getElementById("spawnRange").innerHTML = findSpawnRange(start_zone,HZE);
+    //document.getElementById("result").innerHTML = "Start Zone: " + (start_zone+1) + "<br>"
+    //                                            + "Highest Zone: " + HZE + "<br>"
+    //                                            + "Relic Spawn Zone: " + spawn_zone + "<br>";
+}
+function findSpawnRange(start, HZE)
+{
+    var tt;
+    var range = "Relic spawn range: ";
+    tt = Math.ceil(HZE*.66);
+    start += 1;
+    
+    if(tt - start <= Math.ceil(tt*.3)){
+        range += start + "-" + (start+Math.ceil(tt*.3));
+    }else{
+        range += start + "-" + tt;
+    }
+    return range;
+}
+function clearResults()
+{
+    document.getElementById("spawnRange").innerHTML = "";
+    document.getElementById("item").innerHTML = ""; 
+    $('#divResults').empty();
+    document.getElementById("result").innerHTML = "";
+}
+function createTable(counter, data)
+{
+    var r= "<table><tr><td style='width: 100px; color: red;'>Ascension</td>";
+    r+= "<td style='width: 100px; color: red; text-align: right;'>Spawn Zone</td>";
+    //myTable+="<td style='width: 100px; color: red; text-align: right;'>Col Head 3</td></tr>";
+
+    r+="<tr><td style='width: 100px;                   '>---------------</td>";
+    r+="<td     style='width: 100px; text-align: right;'>---------------</td>";
+    //r+="<td     style='width: 100px; text-align: right;'>---------------</td></tr>";
+
+    for (var i=0; i<data.length; i++) {
+        if(i==0){
+            r+="<tr><td style='width: 100px;'>" + "Current" + "</td>";
+        }else{
+            r+="<tr><td style='width: 100px;'>" + (i+counter) + "</td>";
+        }
+        //r+="<tr><td style='width: 100px;'>" + (i+counter) + "</td>";
+        //alert(data[i]);
+        //data[i] = data[i].toFixed(2);
+        r+="<td style='width: 100px; text-align: right;'>" + data[i] + "</td>";
+        //r+="<td style='width: 100px; text-align: right;'>" + data[i] + "</td></tr>";
+    }  
+    r+="</table>";
+
+    return r;
+}
+function findSeveralStartZones(start, HZE, s, num)
+{
+    var zones = new Array();
+    for(var i=0;i<num;i++) {
+        zones[i] = getBonusItemZone(start, HZE, s);
+        s = randNum(randNum(randNum(randNum(s))));
+    }
+    return zones;
 }
 function findStartZone(data)
 {
