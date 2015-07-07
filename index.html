@@ -55,7 +55,7 @@ function main() {
     if(JSON.stringify(data.items.gotAscensionItem) != "false"){
         document.getElementById("item").innerHTML = "According to the save file, you've already received your relic for this ascension."; 
     }else{
-        document.getElementById("item").innerHTML = "";
+        document.getElementById("item").innerHTML = "According to the save file, you have NOT received your relic for this ascension.";
     }
     $('#divResults').append(results_table);
     document.getElementById("spawnRange").innerHTML = findSpawnRange(start_zone,HZE);
