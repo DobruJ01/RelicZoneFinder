@@ -9,12 +9,15 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
         <script src="https://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/md5.js"></script>
         <textarea id="savedata" style="width: 500px; height: 100px" onfocus="this.select()" onmouseup="return false" placeholder="Paste save file here."></textarea>
+        <br>Zones to Display: 
+        <input type="text" id="numZones" value="5" style="width: 50px" onfocus="this.select()">
         <br>
         <button onclick="main()">Find Relic Zone</button>
         <p id="spawnRange"></p>
+        <p id="item"></p>
         <div id="divResults"></div>
         <p id="result"></p>
-        <p id="item"></p>
+        
 
 <script>
 
@@ -35,9 +38,19 @@ function main() {
     var start_zone = findStartZone(data);
     var spawn_zone = 0;
     var results_table;
-    spawn_zone = getBonusItemZone(start_zone,HZE,zone_seed);
+    var num_zones = 1;
+    if(!parseInt(document.getElementById("numZones").value)){
+        num_zones = 5;
+    }else{
+        num_zones = parseInt(document.getElementById("numZones").value);
+    }
     
-    zones = findSeveralStartZones(start_zone,HZE,zone_seed,5);
+    if(num_zones <0){
+        num_zones = 5;
+    }
+    spawn_zone = getBonusItemZone(start_zone,HZE,zone_seed);
+    //alert(document.getElementById("numZones").value);
+    zones = findSeveralStartZones(start_zone,HZE,zone_seed,num_zones);
     results_table = createTable(data.numWorldResets,zones);
     if(JSON.stringify(data.items.gotAscensionItem) != "false"){
         document.getElementById("item").innerHTML = "According to the save file, you've already received your relic for this ascension."; 
@@ -73,13 +86,14 @@ function clearResults()
 }
 function createTable(counter, data)
 {
-    var r= "<table><tr><td style='width: 100px; color: red;'>Ascension</td>";
-    r+= "<td style='width: 100px; color: red; text-align: right;'>Spawn Zone</td>";
-    //myTable+="<td style='width: 100px; color: red; text-align: right;'>Col Head 3</td></tr>";
+    var r = "<table><tr><td style='width: 100px; color: red;'>Ascension</td>";
+    var level = 0;
+    r += "<td style='width: 100px; color: red; text-align: right;'>Spawn Zone</td>";
+    r +="<td style='width: 100px; color: red; text-align: right;'>Relic Level</td></tr>";
 
     r+="<tr><td style='width: 100px;                   '>---------------</td>";
     r+="<td     style='width: 100px; text-align: right;'>---------------</td>";
-    //r+="<td     style='width: 100px; text-align: right;'>---------------</td></tr>";
+    r+="<td     style='width: 100px; text-align: right;'>---------------</td></tr>";
 
     for (var i=0; i<data.length; i++) {
         if(i==0){
@@ -91,7 +105,9 @@ function createTable(counter, data)
         //alert(data[i]);
         //data[i] = data[i].toFixed(2);
         r+="<td style='width: 100px; text-align: right;'>" + data[i] + "</td>";
-        //r+="<td style='width: 100px; text-align: right;'>" + data[i] + "</td></tr>";
+        
+        level = Math.ceil(Math.max(50*(1-Math.pow(1.2,(-data[i]/100+1))),1)); //Math.max(Math.ceil(()),1),1)
+        r+="<td style='width: 100px; text-align: right;'>" + level + "</td></tr>";
     }  
     r+="</table>";
 
@@ -175,7 +191,24 @@ function range(start, finish, seed)
 {
     return seed % (finish - start + 1) + start;
 }
-
+function weightedChoice(choices, s)
+{
+    var weights = 0;
+    var ran_num = 0;
+    var seed = s;
+    var counter = 0;
+    var total = 0;
+    
+    for(var i=0; i< choices.length;i++){
+        weights += choices[i];
+    }
+    seed = randNum(seed);
+    ran_num = seed % (weights + 1);
+    while (ran_num >= 0){
+        ran_num -= choices[counter];
+        counter++;
+    }
+}
 function randNum(seed) 
 {
     return (seed * 16807) % (2147483647);
