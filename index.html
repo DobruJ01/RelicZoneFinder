@@ -83,18 +83,11 @@ function decodeSaveData()
     }
     return jQuery.parseJSON(atob(txt));
 }
-////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////
 function getBonusItemZone(start, HZE, s)
 {
-//rand() % (param2 - param1 + 1) + param1;
-//seed = seed * 16807 % (2147483646 + 1);
-
     var tt = 0;
     var seed = 0;
     var zone = 0;
-    //Dim modder As Double
     seed = s;
     tt = Math.ceil(HZE * 0.66);
     
@@ -116,14 +109,9 @@ function range(start, finish, seed)
     return seed % (finish - start + 1) + start;
 }
 
-function randNum(seed) {
-    //Dim modder As Double
-    
-    return (seed * 16807) % (2147483646 + 1);
-    //modder = Application.WorksheetFunction.Floor((seed / (2147483646 + 1)), 1) * (2147483646 + 1)
-    //seed = seed - modder
-    
-    //randNum = seed
+function randNum(seed) 
+{
+    return (seed * 16807) % (2147483647);
 }
 </script>
 </body>
