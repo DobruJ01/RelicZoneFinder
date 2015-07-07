@@ -34,6 +34,8 @@ function main() {
 
     if(JSON.stringify(data.items.gotAscensionItem) != "false"){
         document.getElementById("item").innerHTML = "According to the save file, you've already received your relic."; 
+    }else{
+        document.getElementById("item").innerHTML = "";
     }
     document.getElementById("result").innerHTML = "Start Zone: " + (start_zone+1) + "<br>"
                                                 + "Highest Zone: " + HZE + "<br>"
