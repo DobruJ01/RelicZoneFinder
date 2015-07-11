@@ -123,11 +123,10 @@ function findStartZone(data)
     const IRIS = 30;
     var the_item;
     var start_zone = 0;
-    
     //check for items that increase starting zone
-    for(var i=0;i<4;i++){
-        if(data.items.hasOwnProperty(i+1)){
-            the_item = data.items.items[data.items.slots[i+1]];
+    for(var m in data.items.slots){
+        if(data.items.slots.hasOwnProperty(m)){
+            the_item = data.items.items[data.items.slots[m]];
             for (var j=0; j<4; j++) {
                 var str = "bonusType" + j.toString();
                 if(the_item[str] == VISION_RELIC) {
@@ -188,24 +187,6 @@ function getBonusItemZone(start, HZE, s)
 function range(start, finish, seed)
 {
     return seed % (finish - start + 1) + start;
-}
-function weightedChoice(choices, s)
-{
-    var weights = 0;
-    var ran_num = 0;
-    var seed = s;
-    var counter = 0;
-    var total = 0;
-    
-    for(var i=0; i< choices.length;i++){
-        weights += choices[i];
-    }
-    seed = randNum(seed);
-    ran_num = seed % (weights + 1);
-    while (ran_num >= 0){
-        ran_num -= choices[counter];
-        counter++;
-    }
 }
 function randNum(seed) 
 {
