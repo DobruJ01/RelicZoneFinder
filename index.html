@@ -49,7 +49,6 @@ function main() {
         num_zones = 5;
     }
     spawn_zone = getBonusItemZone(start_zone,HZE,zone_seed);
-    //alert(document.getElementById("numZones").value);
     zones = findSeveralStartZones(start_zone,HZE,zone_seed,num_zones);
     results_table = createTable(data.numWorldResets,zones);
     if(JSON.stringify(data.items.gotAscensionItem) != "false"){
@@ -59,9 +58,6 @@ function main() {
     }
     $('#divResults').append(results_table);
     document.getElementById("spawnRange").innerHTML = findSpawnRange(start_zone,HZE);
-    //document.getElementById("result").innerHTML = "Start Zone: " + (start_zone+1) + "<br>"
-    //                                            + "Highest Zone: " + HZE + "<br>"
-    //                                            + "Relic Spawn Zone: " + spawn_zone + "<br>";
 }
 function findSpawnRange(start, HZE)
 {
@@ -101,12 +97,9 @@ function createTable(counter, data)
         }else{
             r+="<tr><td style='width: 100px;'>" + (i+counter) + "</td>";
         }
-        //r+="<tr><td style='width: 100px;'>" + (i+counter) + "</td>";
-        //alert(data[i]);
-        //data[i] = data[i].toFixed(2);
         r+="<td style='width: 100px; text-align: right;'>" + data[i] + "</td>";
         
-        level = Math.ceil(Math.max(50*(1-Math.pow(1.2,(-data[i]/100+1))),1)); //Math.max(Math.ceil(()),1),1)
+        level = Math.ceil(Math.max(50*(1-Math.pow(1.2,(-data[i]/100+1))),1));
         r+="<td style='width: 100px; text-align: right;'>" + level + "</td></tr>";
     }  
     r+="</table>";
@@ -119,10 +112,6 @@ function findSeveralStartZones(start, HZE, s, num)
     var previous_seed = 0;
     for(var i=0;i<num;i++) {
         zones[i] = getBonusItemZone(start, HZE, s);
-        //if(zones[i] == 1099){
-        //    alert(previous_seed);
-        //}
-        //previous_seed = s;
         s = randNum(randNum(randNum(randNum(s))));
         
     }
@@ -134,9 +123,10 @@ function findStartZone(data)
     const IRIS = 30;
     var the_item;
     var start_zone = 0;
+    
     //check for items that increase starting zone
     for(var i=0;i<4;i++){
-        if(data.items.slots[i+1]){
+        if(data.items.hasOwnProperty(i+1)){
             the_item = data.items.items[data.items.slots[i+1]];
             for (var j=0; j<4; j++) {
                 var str = "bonusType" + j.toString();
@@ -147,7 +137,7 @@ function findStartZone(data)
         }
     }
     //check for Iris
-    if(data.ancients.ancients[IRIS].level) {
+    if(data.ancients.ancients.hasOwnProperty(IRIS)) {
         start_zone += data.ancients.ancients[IRIS].level;
     }
     return start_zone;
