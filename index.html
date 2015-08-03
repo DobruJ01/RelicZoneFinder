@@ -4,27 +4,107 @@
         <title>Relic Zone Finder</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="https://cdn.datatables.net/1.10.7/css/jquery.dataTables.css">
+        <script type="text/javascript" language="javascript" src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
+        <script src="https://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/md5.js"></script>
+        
+        
+        
+        <script type="text/javascript" src="/media/js/site.js?_=207805c784725de7bada944126dbaa67"></script>
+	<script type="text/javascript" src="/media/js/dynamic.php?comments-page=examples%2Fdata_sources%2Fjs_array.html" async=""></script>
+	
+	<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/1.10.7/js/jquery.dataTables.min.js"></script>
+<!--	<script type="text/javascript" language="javascript" src="../resources/demo.js"></script>-->
+        <script type="text/javascript" class="init"></script> 
+        <style>
+            body
+            {
+                background-color: #222222;//#FFFFE0;
+                font-size: 20px;
+                //height: 800px;
+                //overflow: auto;
+            }
+            .content_bg
+            {
+                //height: 80px;
+                width: 980px;
+                background-color: #d3d3d3;
+                //opacity: 0.5;
+                min-height: 1000px;
+                overflow: auto;
+                margin: auto;
+                padding-left: 10px;
+                padding-right: 10px;
+            }
+            #content
+            {
+                width:800px;
+                margin:auto; 
+                height: 800px; 
+                //background:#fff; 
+                //overflow:auto;
+}
+            p{
+                font-size: 20px;
+            }
+            .dataTables_wrapper { font-size: 20px }
+
+        </style>
+        
     </head>
     <body>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-        <script src="https://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/md5.js"></script>
-        <textarea id="savedata" style="width: 500px; height: 100px" onfocus="this.select()" onmouseup="return false" placeholder="Paste save file here."></textarea>
-        <br>Zones to Display: 
-        <input type="text" id="numZones" value="5" style="width: 50px" onfocus="this.select()">
-        <br>
-        <button onclick="main()">Find Relic Zone</button>
-        <p id="spawnRange"></p>
-        <p id="item"></p>
-        <div id="divResults"></div>
-        <p id="result"></p>
-        
+
+        <div class="content_bg">
+<!--            <div id="content">-->
+                <textarea id="savedata" style="width: 500px; height: 50px" onfocus="this.select()" onmouseup="return false" placeholder="Paste save file here."></textarea>
+                <br>Zones to Display: 
+                <input type="text" id="numZones" value="5" style="width: 50px" onfocus="this.select()">
+                <br>
+                <button id="findZone">Find Relic Zone</button>
+                <p id="spawnRange">Relic Spawn Range: </p>
+                <p id="item">Load save file for results.</p>
+
+                <br>
+                <table cellpadding="0" cellspacing="0" border="0" class="display" id="result" width="100%">
+                    <!--<thead>
+                        <tr>
+                            <th>Ascension</th>
+                            <th>Spawn Zone</th>
+                            <th>Relic Level</th>
+                        </tr>
+                    </thead>-->
+                </table>
+<!--            </div>-->
+        </div>
 
 <script>
 
-function main() {
-    clearResults();
+    $(document).ready(function() {
+        var t = $('#result').DataTable({
+            "ordering":false,
+            "bPaginate":false,
+            "searching":false,
+            "bInfo" : false,
+            "columns": [
+                    { "title": "Ascension", "class": "dt-head-left"  },
+                    { "title": "Spawn Zone", "class": "dt-head-left" },
+                    { "title": "Relic Level", "class": "dt-head-left" }]
+            });
+
+        $('#findZone').on( 'click', function () {
+            t.clear();
+            var the_data = findZones();
+            t.rows.add(the_data).draw();
+
+            counter++;
+        } );
+    } );
+
+function findZones() 
+{
     var data = decodeSaveData();
     var start_zones = new Array();
+    var results_table;
     if(!data){
         return;
     }
@@ -37,7 +117,7 @@ function main() {
     var HZE = data.highestFinishedZonePersist;
     var start_zone = findStartZone(data);
     var spawn_zone = 0;
-    var results_table;
+    
     var num_zones = 1;
     if(isNaN(document.getElementById("numZones").value)){
         num_zones = 5;
@@ -48,21 +128,22 @@ function main() {
     if(num_zones <0){
         num_zones = 5;
     }
-    spawn_zone = getBonusItemZone(start_zone,HZE,zone_seed);
     zones = findSeveralStartZones(start_zone,HZE,zone_seed,num_zones);
     results_table = createTable(data.numWorldResets,zones);
+    
     if(JSON.stringify(data.items.gotAscensionItem) != "false"){
-        document.getElementById("item").innerHTML = "According to the save file, you've already received your relic for this ascension."; 
+        document.getElementById("item").innerHTML = "&#10004; Relic received!"; 
     }else{
-        document.getElementById("item").innerHTML = "According to the save file, you have NOT received your relic for this ascension.";
+        document.getElementById("item").innerHTML = "X Relic not received.";
     }
-    $('#divResults').append(results_table);
     document.getElementById("spawnRange").innerHTML = findSpawnRange(start_zone,HZE);
+    
+    return results_table;
 }
 function findSpawnRange(start, HZE)
 {
     var tt;
-    var range = "Relic spawn range: ";
+    var range = "Relic Spawn Range: ";
     tt = Math.ceil(HZE*.66);
     start += 1;
     
@@ -73,38 +154,17 @@ function findSpawnRange(start, HZE)
     }
     return range;
 }
-function clearResults()
-{
-    document.getElementById("spawnRange").innerHTML = "";
-    document.getElementById("item").innerHTML = ""; 
-    $('#divResults').empty();
-    document.getElementById("result").innerHTML = "";
-}
 function createTable(counter, data)
 {
-    var r = "<table><tr><td style='width: 100px; color: red;'>Ascension</td>";
-    var level = 0;
-    r += "<td style='width: 100px; color: red; text-align: right;'>Spawn Zone</td>";
-    r +="<td style='width: 100px; color: red; text-align: right;'>Relic Level</td></tr>";
-
-    r+="<tr><td style='width: 100px;                   '>---------------</td>";
-    r+="<td     style='width: 100px; text-align: right;'>---------------</td>";
-    r+="<td     style='width: 100px; text-align: right;'>---------------</td></tr>";
-
+    var dataset = [];
+    
     for (var i=0; i<data.length; i++) {
-        if(i==0){
-            r+="<tr><td style='width: 100px;'>" + "Current" + "</td>";
-        }else{
-            r+="<tr><td style='width: 100px;'>" + (i+counter) + "</td>";
-        }
-        r+="<td style='width: 100px; text-align: right;'>" + data[i] + "</td>";
-        
-        level = Math.ceil(Math.max(50*(1-Math.pow(1.2,(-data[i]/100+1))),1));
-        r+="<td style='width: 100px; text-align: right;'>" + level + "</td></tr>";
-    }  
-    r+="</table>";
-
-    return r;
+        dataset.push([i+counter,data[i],Math.ceil(Math.max(50*(1-Math.pow(1.2,(-data[i]/100+1))),1))])
+    }
+    if(dataset.length > 0){
+        dataset[0][0] = "Current";
+    }
+    return dataset;
 }
 function findSeveralStartZones(start, HZE, s, num)
 {
@@ -143,25 +203,24 @@ function findStartZone(data)
 }
 function decodeSaveData() 
 {
-//Decode function (mostly) taken from Rivsoft (http://s3-us-west-2.amazonaws.com/clickerheroes/ancientssoul.html)
-    const ANTI_CHEAT_CODE = "Fe12NAfA3R6z4k0z";
-    const SALT = "af0ik392jrmt0nsfdghy0";
-    var txt = $("#savedata").val();
+    var data = $("#savedata").val();
+    var TEXT_SPLITTER = "Fe12NAfA3R6z4k0z";
+    var SALT = "af0ik392jrmt0nsfdghy0";
+    var components = data.split(TEXT_SPLITTER);
+    var str = "";
 
-    if (txt.search(ANTI_CHEAT_CODE) != -1) {
-        var result = txt.split(ANTI_CHEAT_CODE);
-        txt = "";
-        for (var i = 0; i < result[0].length; i += 2) {
-            txt += result[0][i];
+    if (~data.indexOf(TEXT_SPLITTER)) {
+        var counter = 0;
+        while(counter <components[0].length){
+            str += components[0][counter];
+            counter += 2;
         }
-        if (CryptoJS.MD5(txt + SALT) != result[1]) {
-            alert("Invalid Save File");
-            return;
+        if(CryptoJS.MD5(str + SALT) == components[1]){
+            return jQuery.parseJSON(atob(str));
         }
-    }else{
-        alert("Not a valid save file");
     }
-    return jQuery.parseJSON(atob(txt));
+    alert("Not a valid save file");
+    return;
 }
 function getBonusItemZone(start, HZE, s)
 {
@@ -192,6 +251,8 @@ function randNum(seed)
 {
     return (seed * 16807) % (2147483647);
 }
+
 </script>
+
 </body>
 </html>
