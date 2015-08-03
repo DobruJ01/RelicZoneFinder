@@ -2,48 +2,30 @@
 <html>
     <head>
         <title>Relic Zone Finder</title>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="https://cdn.datatables.net/1.10.7/css/jquery.dataTables.css">
+<!--        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
         <script type="text/javascript" language="javascript" src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
         <script src="https://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/md5.js"></script>
-        
-        
-        
-        <script type="text/javascript" src="/media/js/site.js?_=207805c784725de7bada944126dbaa67"></script>
-	<script type="text/javascript" src="/media/js/dynamic.php?comments-page=examples%2Fdata_sources%2Fjs_array.html" async=""></script>
-	
 	<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/1.10.7/js/jquery.dataTables.min.js"></script>
-<!--	<script type="text/javascript" language="javascript" src="../resources/demo.js"></script>-->
-        <script type="text/javascript" class="init"></script> 
+        <link rel="stylesheet" href="https://cdn.datatables.net/1.10.7/css/jquery.dataTables.css">
         <style>
             body
             {
-                background-color: #222222;//#FFFFE0;
+                background-color: #222222;
                 font-size: 20px;
-                //height: 800px;
-                //overflow: auto;
             }
             .content_bg
             {
-                //height: 80px;
                 width: 980px;
                 background-color: #d3d3d3;
-                //opacity: 0.5;
                 min-height: 1000px;
                 overflow: auto;
                 margin: auto;
                 padding-left: 10px;
                 padding-right: 10px;
+                padding-top: 10px;
+                padding-bottom: 10px;
             }
-            #content
-            {
-                width:800px;
-                margin:auto; 
-                height: 800px; 
-                //background:#fff; 
-                //overflow:auto;
-}
             p{
                 font-size: 20px;
             }
@@ -55,30 +37,19 @@
     <body>
 
         <div class="content_bg">
-<!--            <div id="content">-->
-                <textarea id="savedata" style="width: 500px; height: 50px" onfocus="this.select()" onmouseup="return false" placeholder="Paste save file here."></textarea>
-                <br>Zones to Display: 
-                <input type="text" id="numZones" value="5" style="width: 50px" onfocus="this.select()">
-                <br>
-                <button id="findZone">Find Relic Zone</button>
-                <p id="spawnRange">Relic Spawn Range: </p>
-                <p id="item">Load save file for results.</p>
+            <textarea id="savedata" style="width: 500px; height: 50px" onfocus="this.select()" onmouseup="return false" placeholder="Paste save file here."></textarea>
+            <br>Zones to Display: 
+            <input type="text" id="numZones" value="5" style="width: 50px" onfocus="this.select()">
+            <br>
+            <button id="findZone">Find Relic Zone</button>
+            <p id="spawnRange">Relic Spawn Range: </p>
+            <p id="item">Load save file for results.</p>
 
-                <br>
-                <table cellpadding="0" cellspacing="0" border="0" class="display" id="result" width="100%">
-                    <!--<thead>
-                        <tr>
-                            <th>Ascension</th>
-                            <th>Spawn Zone</th>
-                            <th>Relic Level</th>
-                        </tr>
-                    </thead>-->
-                </table>
-<!--            </div>-->
+            <br>
+            <table cellpadding="0" cellspacing="0" border="0" class="display" id="result" width="100%"></table>
         </div>
 
-<script>
-
+<script type="text/javascript">
     $(document).ready(function() {
         var t = $('#result').DataTable({
             "ordering":false,
