@@ -6,7 +6,7 @@
         <script src="//crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/md5.js"></script>
 	<script type="text/javascript" language="javascript" src="//cdn.datatables.net/1.10.7/js/jquery.dataTables.min.js"></script>
         <link rel="stylesheet" href="//cdn.datatables.net/1.10.7/css/jquery.dataTables.css">
-        <script type="text/javascript" src="js/ColReorderWithResize.js"></script>
+        <script type="text/javascript" src="js/dataTables.colResize.js"></script>
         <style>
             body
             {
@@ -45,6 +45,10 @@
                 display:none;
             }
             .dataTables_wrapper { font-size: 14px }
+            .result
+            {
+                border-collapse: separate;
+            }
         </style>
         
     </head>
@@ -55,20 +59,21 @@
             <br>Zones to Display: 
             <input type="text" id="numZones" value="5" style="width: 50px" onfocus="this.select()">
             <br>
-            <button id="findZone">Find Relic Zone</button>
+            <button id="findZone">Generate Items Table</button>
+            <button id="createFile">Export Results to File</button>
             <p id="spawnRange">Relic Spawn Range: </p>
             <p id="ascension">Current Ascension: </p>
             <p id="item">Load save file for results.</p>
 
             <br>
             <div class="tableDiv" id="tableHide">
-                <table cellpadding="0" cellspacing="0" border="0" class="display" id="result" width="100%"></table>
+                <table class="display" id="result" width="100%"></table>
             </div>
             <div class="loading" id="loadHide"></div>
         </div>
 
 <script type="text/javascript">
-        var timeout_id;
+        var timeout_id = null;
         t = $('#result').DataTable({
             "ordering":true,
             "bPaginate":true,
@@ -76,13 +81,18 @@
             "searching":true,
             "language":{"emptyTable":"Data is being populated"},
             "processing":true,
+            "bScrollCollapse": true,
+            "autowidth":false,
             "bInfo" : true,
-            "sDom": "Rlfrtip",
+            "dom": 'Zlfrtip',
+            "colResize": {
+                "tableWidthFixed": true
+            },
             "columns": [
-                    { "title": "Ascension", "class": "dt-head-left"  },
-                    { "title": "Spawn Zone", "class": "dt-head-left" },
-                    { "title": "Relic Level", "class": "dt-head-left" },
-                    { "title": "Rarity", "class": "dt-head-left" },
+                    { "title": "Ascension", "class": "dt-head-left", "width":"5%"  },
+                    { "title": "Spawn Zone", "class": "dt-head-left"},
+                    { "title": "Level", "class": "dt-head-left", "width":"5%" },
+                    { "title": "Rarity", "class": "dt-head-left", "width":"5%" },
                     { "title": "Ability 1", "class": "dt-head-left" },
                     { "title": "Ability 2", "class": "dt-head-left" },
                     { "title": "Ability 3", "class": "dt-head-left" },
@@ -90,12 +100,16 @@
             });
         $('#findZone').on( 'click', function () {
             clearTimeout(timeout_id);
+            timeout_id = null;
             t.clear().draw();
-            findZones();
+            findZones(false);
+        } );
+        $('#createFile').on( 'click', function () {
+            findZones(true);
         } );
 
 
-function findZones() 
+function findZones(write_to_file) 
 {
     var data = decodeSaveData();
     var start_zones = new Array();
@@ -107,8 +121,6 @@ function findZones()
         alert("You need to ascend before getting relics.");
         return;
     }
-    document.getElementById("tableHide").style.display="none";
-    document.getElementById("loadHide").style.display="block";
     var zone_seed = data.items.bonusZoneRoller.seed;
     var ascension_seed = data.items.ascensionItemsRoller.seed;
     var HZE = data.highestFinishedZonePersist;
@@ -129,7 +141,10 @@ function findZones()
     if(num_zones <0){
         num_zones = 5;
     }
-    
+    if(num_zones > 1500){
+        document.getElementById("tableHide").style.display="none";
+        document.getElementById("loadHide").style.display="block";
+    }
     //web worker for long calculation
     if(the_worker !== undefined){
         the_worker.terminate();
@@ -139,22 +154,27 @@ function findZones()
     
     worker_data = {"SZ":start_zone,"HZE":HZE,"zoneSeed":zone_seed,"numZones":num_zones,
                    "ascensionSeed":ascension_seed,"itemReceived":item_received,
-                   "ascensions":data.numWorldResets};
-               
+                   "ascensions":data.numWorldResets,"writeToFile":write_to_file};
     //start worker
     the_worker.postMessage(worker_data);
     
     //handle response from worker
-    the_worker.addEventListener('message', function(event){
+    the_worker.addEventListener('message', function(event){        
         document.getElementById("loadHide").style.display="none";
-        document.getElementById("tableHide").style.display="block";
+        if(write_to_file){
+            if(timeout_id !== null){
+                document.getElementById("tableHide").style.display="block";
+            }
+            downloadFile(event.data,num_zones);
+        }else{
+            document.getElementById("tableHide").style.display="block";
+            t.clear().draw();
+            timeout_id = setTimeout(function(){
+                addRowsToTable(event.data,0,Math.floor(event.data.length/10),0);
+            },100);
+        }
         the_worker.terminate();
-        the_worker = undefined;        
-        t.clear().draw();
-        timeout_id = setTimeout(function(){
-            addRowsToTable(event.data,0,Math.floor(event.data.length/10),0);
-        },100);
-        
+        the_worker = undefined;
     });
 
     if(JSON.stringify(data.items.gotAscensionItem) != "false"){
@@ -166,9 +186,21 @@ function findZones()
     document.getElementById("ascension").innerHTML = "Current Ascension: " + data.numWorldResets;
     return results_table;
 }
+function downloadFile(data, num_zones)
+{
+    var a = document.createElement('a');
+            
+    csvData = new Blob([data], { type: 'text/csv' }); 
+    var csvUrl = URL.createObjectURL(csvData);
+    a.href =  csvUrl;
+    a.target = '_blank';
+    a.download = num_zones + " items" + ".csv";
+    document.body.appendChild(a);
+    a.click();
+}
 function addRowsToTable(data,start,updater,total)
 {
-    var inc = 100;
+    var inc = 20;
     var page;
     
     if(start + inc > data.length){
@@ -178,7 +210,7 @@ function addRowsToTable(data,start,updater,total)
         t.row.add(data[i]);
     }
     if(inc + start < data.length){
-        if(/*start == 0 ||*/ (start+inc) > total)
+        if((start+inc) > total)
         {
             total += updater;
             page = t.page.info().page;
@@ -187,6 +219,7 @@ function addRowsToTable(data,start,updater,total)
         timeout_id = setTimeout(function(){
             addRowsToTable(data,start+inc,updater,total);},1);
     }else{
+        timeout_id = null;
         t.draw();
     }
 }

@@ -9,7 +9,18 @@ self.addEventListener('message',  function(event)
     
     results_table = createTable(event.data.ascensions,zones, items);
 
-    postMessage(results_table);
+    if(event.data.writeToFile){
+        var csvRows = [['Ascension','Spawn Zone','Level','Rarity','Ability 1','Ability 2','Ability 3','Ability 4']];
+        
+        for(var i=0;i<results_table.length;++i){
+            csvRows.push(results_table[i].join(','));
+        }
+
+        var csvString = csvRows.join("\r\n");
+        postMessage(csvString);
+    }else{
+        postMessage(results_table);
+    }
 });
 
 function createTable(counter, data, items)
