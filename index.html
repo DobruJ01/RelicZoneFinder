@@ -59,8 +59,8 @@
             <br>Zones to Display: 
             <input type="text" id="numZones" value="5" style="width: 50px" onfocus="this.select()">
             <br>
-            <button id="findZone">Generate Items Table</button>
-            <button id="createFile">Export Results to File</button>
+            <button id="findZone">Generate Table</button>
+            <button id="createFile">Generate File</button>
             <p id="spawnRange">Relic Spawn Range: </p>
             <p id="ascension">Current Ascension: </p>
             <p id="item">Load save file for results.</p>
@@ -162,7 +162,7 @@ function findZones(write_to_file)
     the_worker.addEventListener('message', function(event){        
         document.getElementById("loadHide").style.display="none";
         if(write_to_file){
-            if(timeout_id !== null){
+            if(t.data().length > 0){
                 document.getElementById("tableHide").style.display="block";
             }
             downloadFile(event.data,num_zones);
@@ -177,14 +177,15 @@ function findZones(write_to_file)
         the_worker = undefined;
     });
 
-    if(JSON.stringify(data.items.gotAscensionItem) != "false"){
-        document.getElementById("item").innerHTML = "&#10004; Relic received!"; 
-    }else{
-        document.getElementById("item").innerHTML = "X Relic not received.";
+    if(!write_to_file){
+        if(JSON.stringify(data.items.gotAscensionItem) != "false"){
+            document.getElementById("item").innerHTML = "&#10004; Relic received!"; 
+        }else{
+            document.getElementById("item").innerHTML = "X Relic not received.";
+        }
+        document.getElementById("spawnRange").innerHTML = findSpawnRange(start_zone,HZE);
+        document.getElementById("ascension").innerHTML = "Current Ascension: " + data.numWorldResets;
     }
-    document.getElementById("spawnRange").innerHTML = findSpawnRange(start_zone,HZE);
-    document.getElementById("ascension").innerHTML = "Current Ascension: " + data.numWorldResets;
-    return results_table;
 }
 function downloadFile(data, num_zones)
 {
