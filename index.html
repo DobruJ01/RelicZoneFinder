@@ -2,11 +2,11 @@
 <html>
     <head>
         <title>Relic Zone Finder</title>
-        <script type="text/javascript" language="javascript" src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
-        <script src="https://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/md5.js"></script>
-        <!--<script src="worker.js"></script>-->
-	<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/1.10.7/js/jquery.dataTables.min.js"></script>
-        <link rel="stylesheet" href="https://cdn.datatables.net/1.10.7/css/jquery.dataTables.css">
+        <script type="text/javascript" language="javascript" src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+        <script src="//crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/md5.js"></script>
+	<script type="text/javascript" language="javascript" src="//cdn.datatables.net/1.10.7/js/jquery.dataTables.min.js"></script>
+        <link rel="stylesheet" href="//cdn.datatables.net/1.10.7/css/jquery.dataTables.css">
+        <script type="text/javascript" src="js/ColReorderWithResize.js"></script>
         <style>
             body
             {
@@ -29,7 +29,7 @@
                 font-size: 20px;
             }
             .loading{
-                background-image: url("http://i.stack.imgur.com/MnyxU.gif");
+                background-image: url("img/spinner.gif");
                 background-repeat: no-repeat;
                 height:200px;
                 width:200px;
@@ -44,8 +44,7 @@
             {
                 display:none;
             }
-            .dataTables_wrapper { font-size: 12px }
-
+            .dataTables_wrapper { font-size: 14px }
         </style>
         
     </head>
@@ -62,15 +61,14 @@
             <p id="item">Load save file for results.</p>
 
             <br>
-            <div class="tableDiv" id="tableHide"> <!--style="display:block"-->
+            <div class="tableDiv" id="tableHide">
                 <table cellpadding="0" cellspacing="0" border="0" class="display" id="result" width="100%"></table>
             </div>
             <div class="loading" id="loadHide"></div>
         </div>
 
 <script type="text/javascript">
-    //var data;
-    $(document).ready(function() {
+
         t = $('#result').DataTable({
             "ordering":true,
             "bPaginate":true,
@@ -79,6 +77,7 @@
             "language":{"emptyTable":"Data is being populated"},
             "processing":true,
             "bInfo" : true,
+            "sDom": "Rlfrtip",
             "columns": [
                     { "title": "Ascension", "class": "dt-head-left"  },
                     { "title": "Spawn Zone", "class": "dt-head-left" },
@@ -94,7 +93,6 @@
             t.clear().draw();
             findZones();
         } );
-    } );
 var timeout_id;
 
 function findZones() 
@@ -137,7 +135,7 @@ function findZones()
         the_worker.terminate();
         the_worker = undefined;
     }
-    the_worker = new Worker("worker.js");
+    the_worker = new Worker("js/worker.js");
     
     worker_data = {"SZ":start_zone,"HZE":HZE,"zoneSeed":zone_seed,"numZones":num_zones,
                    "ascensionSeed":ascension_seed,"itemReceived":item_received,
@@ -154,7 +152,7 @@ function findZones()
         the_worker = undefined;        
         t.clear().draw();
         timeout_id = setTimeout(function(){
-            addRowsToTable(event.data,0);
+            addRowsToTable(event.data,0,Math.floor(event.data.length/10));
         },100);
         
     });
@@ -168,7 +166,7 @@ function findZones()
     document.getElementById("ascension").innerHTML = "Current Ascension: " + data.numWorldResets;
     return results_table;
 }
-function addRowsToTable(data,start)
+function addRowsToTable(data,start,updater)
 {
     var inc = 100;
     var page;
@@ -180,13 +178,13 @@ function addRowsToTable(data,start)
         t.row.add(data[i]);
     }
     if(inc + start < data.length){
-        if(start == 0 || (start+inc) % 10000 == 0)
+        if(start == 0 || (start+inc) % updater == 0)
         {
             page = t.page.info().page;
             t.page(page).draw(false);
         }
         timeout_id = setTimeout(function(){
-            addRowsToTable(data,start+inc);},1);
+            addRowsToTable(data,start+inc,updater);},1);
     }else{
         t.draw();
     }

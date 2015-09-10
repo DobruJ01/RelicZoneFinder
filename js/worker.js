@@ -1,6 +1,5 @@
 self.addEventListener('message',  function(event)
 {
-    //var currPrime = event.data;
     var zones;
     var items;
     var results_table;
