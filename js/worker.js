@@ -84,7 +84,7 @@ function randNum(seed)
 function findItems(s, zones,got_item)
 {
     var seed = s;
-    var ability_odds = [6,5,4,3];
+    var ability_odds = [[6,5,4,3],[6,5,4],[6,5]];
     var rarity_odds = [5000,2000,800,300,100,25,8,1];
     var ability_conv = [1,2,3,4];
     var rarity_conv = ["Common","Uncommon","Rare","Epic","Fabled","Mythical","Legendary","Transcendent"];
@@ -111,7 +111,7 @@ function findItems(s, zones,got_item)
 
        //find num abilities
        seed = randNum(seed);
-       num_abilities = ability_conv[weightedChoice(ability_odds,seed)];
+       num_abilities = relic_level === 1 ? 1 : ability_conv[weightedChoice(ability_odds[Math.max(0,4-relic_level)],seed)];
 
        //find which abilities
        for(var i=0;i<24;i++){

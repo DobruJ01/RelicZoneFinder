@@ -121,6 +121,7 @@ function findZones(write_to_file)
         alert("You need to ascend before getting relics.");
         return;
     }
+
     var zone_seed = data.items.bonusZoneRoller.seed;
     var ascension_seed = data.items.ascensionItemsRoller.seed;
     var HZE = data.highestFinishedZonePersist;
@@ -269,7 +270,16 @@ function decodeSaveData()
     var SALT = "af0ik392jrmt0nsfdghy0";
     var components = data.split(TEXT_SPLITTER);
     var str = "";
-
+    
+    if(data.charAt(0) == '{'){
+        var parsed_data = "";
+        try
+        {
+            parsed_data = $.parseJSON(data);
+        }catch(Exception){alert("Invalid Format");}
+        
+        return parsed_data;
+    }
     if (~data.indexOf(TEXT_SPLITTER)) {
         var counter = 0;
         while(counter <components[0].length){
@@ -277,7 +287,7 @@ function decodeSaveData()
             counter += 2;
         }
         if(CryptoJS.MD5(str + SALT) == components[1]){
-            return jQuery.parseJSON(atob(str));
+            return $.parseJSON(atob(str));
         }
     }
     alert("Not a valid save file");
