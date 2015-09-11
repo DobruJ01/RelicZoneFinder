@@ -171,7 +171,7 @@ function findZones(write_to_file)
             document.getElementById("tableHide").style.display="block";
             t.clear().draw();
             timeout_id = setTimeout(function(){
-                addRowsToTable(event.data,0,Math.floor(event.data.length/10),0);
+                addRowsToTable(event.data,0);
             },100);
         }
         the_worker.terminate();
@@ -212,10 +212,8 @@ function addRowsToTable(data,start)
         t.row.add(data[i]);
     }
     if(inc + start < data.length){
-        alert(t.page.info().page + " " + t.page.info().pages);
         if(t.page.info().page == t.page.info().pages-1 || start == 0)
         {
-            total += updater;
             page = t.page.info().page;
             t.draw();
             t.page(page).draw(false);
