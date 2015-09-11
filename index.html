@@ -200,7 +200,7 @@ function downloadFile(data, num_zones)
     document.body.appendChild(a);
     a.click();
 }
-function addRowsToTable(data,start,updater,total)
+function addRowsToTable(data,start)
 {
     var inc = 20;
     var page;
@@ -212,14 +212,16 @@ function addRowsToTable(data,start,updater,total)
         t.row.add(data[i]);
     }
     if(inc + start < data.length){
-        if((start+inc) > total)
+        alert(t.page.info().page + " " + t.page.info().pages);
+        if(t.page.info().page == t.page.info().pages-1 || start == 0)
         {
             total += updater;
             page = t.page.info().page;
+            t.draw();
             t.page(page).draw(false);
         }
         timeout_id = setTimeout(function(){
-            addRowsToTable(data,start+inc,updater,total);},1);
+            addRowsToTable(data,start+inc);},1);
     }else{
         timeout_id = null;
         t.draw();
