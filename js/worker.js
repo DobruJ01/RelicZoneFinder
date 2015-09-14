@@ -5,9 +5,9 @@ self.addEventListener('message',  function(event)
     var results_table;
     var first_ascend = event.data.ascensionsFirst;
     var ascend_seed = event.data.zoneSeed;
-    
+    //var relic_purchases = event.data.rubyRelic /3;
     //Account for fake ascensions
-    for(var i=0;i<first_ascend;i++){
+    for(var i=0;i<first_ascend+event.data.rubyRelic;i++){
         ascend_seed = nextAscensionSeed(ascend_seed);
     }
     
@@ -15,7 +15,9 @@ self.addEventListener('message',  function(event)
     if(first_ascend>0){
         event.data.itemReceived = false;
     }
-    
+//    for(var i=0;i<relic_purchases;i++){
+//        ascend_seed = nextAscensionSeed(ascend_seed);
+//    }
     //find all spawn zones
     zones = findSeveralStartZones(event.data.SZ,event.data.HZE,ascend_seed,event.data.numZones);
     
