@@ -3,11 +3,25 @@ self.addEventListener('message',  function(event)
     var zones;
     var items;
     var results_table;
+    var first_ascend = event.data.ascensionsFirst;
+    var ascend_seed = event.data.zoneSeed;
     
-    zones = findSeveralStartZones(event.data.SZ,event.data.HZE,event.data.zoneSeed,event.data.numZones);
-    items = findItems(event.data.ascensionSeed,zones,event.data.itemReceived);
+    //Account for fake ascensions
+    for(var i=0;i<first_ascend;i++){
+        ascend_seed = nextAscensionSeed(ascend_seed);
+    }
     
-    results_table = createTable(event.data.ascensions,zones, items);
+    //If there's a fake ascension then the seed is no longer offset
+    if(first_ascend>0){
+        event.data.itemReceived = false;
+    }
+    
+    //find all spawn zones
+    zones = findSeveralStartZones(event.data.SZ,event.data.HZE,ascend_seed,event.data.numZones);
+    
+    items = findItems(event.data.ascensionSeed,zones,event.data.itemReceived,event.data.rubyRelic,event.data.HZE,event.data.highestLevelItem);
+    
+    results_table = createTable(event.data.ascensions+first_ascend,zones, items,event.data.rubyRelic);
 
     if(event.data.writeToFile){
         var csvRows = [['Ascension','Spawn Zone','Level','Rarity','Ability 1','Ability 2','Ability 3','Ability 4']];
@@ -23,20 +37,32 @@ self.addEventListener('message',  function(event)
     }
 });
 
-function createTable(counter, data, items)
+function createTable(ascension_counter, zones, items,relics_purchased)
 {
     var dataset = [];
-
-    for (var i=0; i<data.length; i++) {
+    
+    for(var i=0;i<relics_purchased;i++){
         dataset.push(
-                [i+counter,
-                data[i],
+                [i+1,
+                "purchased",
                 items[i][0],
                 items[i][1],
                 items[i][2],
                 items[i][3],
                 items[i][4],
                 items[i][5]]);
+    }
+    console.log(items.length);
+    for (var i=0; i<zones.length; i++) {
+        dataset.push(
+                [i+ascension_counter,
+                zones[i],
+                items[i+relics_purchased][0],
+                items[i+relics_purchased][1],
+                items[i+relics_purchased][2],
+                items[i+relics_purchased][3],
+                items[i+relics_purchased][4],
+                items[i+relics_purchased][5]]);
     }
 
     return dataset;
@@ -47,10 +73,14 @@ function findSeveralStartZones(start, HZE, s, num)
     var previous_seed = 0;
     for(var i=0;i<num;i++) {
         zones[i] = getBonusItemZone(start, HZE, s);
-        s = randNum(randNum(randNum(randNum(s))));
+        s = nextAscensionSeed(s);
 
     }
     return zones;
+}
+function nextAscensionSeed(seed)
+{
+    return randNum(randNum(randNum(randNum(seed))));
 }
 function getBonusItemZone(start, HZE, s)
 {
@@ -81,78 +111,104 @@ function randNum(seed)
 {
     return (seed * 16807) % (2147483647);
 }
-function findItems(s, zones,got_item)
+function findItems(s, zones,got_item,relics_to_buy,HZE,highest_level_item)
 {
     var seed = s;
+    var j = 0;
+    var items = [];
+    var level;
+   console.log("relics to buy: " + relics_to_buy);
+   
+    //Relics bought with rubies
+    for(var i=0;i<relics_to_buy;i++){
+        level = Math.ceil(50 * (1 - Math.pow(1.2,-((HZE - 100) / 100))));
+        level = Math.max(1,level);
+        level = Math.min(highest_level_item + 5,level);
+        seed = randNum(seed);
+        level = range(Math.ceil(level*.75),level,seed);
+        seed = generateItem(level,seed,items);
+    }
+    console.log("items length:" + items.length);
+    if(got_item ){
+        items.push(["the", "seed", "already", "changed", "cannot", "predict"]);
+        j=1;
+    }
+    console.log("items length:" + items.length);
+    //Relics from relic ooze
+    console.log("zones length: " + zones.length);
+    for (;j<zones.length;j++){
+        level = Math.ceil(Math.max(50*(1-Math.pow(1.2,(-(zones[j]-1)/100+1))),1));
+        seed = generateItem(level,seed,items);
+    }
+    console.log("items length:" + items.length);
+   return items;
+}
+function generateItem(level, s,items)
+{
     var ability_odds = [[6,5,4,3],[6,5,4],[6,5]];
     var rarity_odds = [5000,2000,800,300,100,25,8,1];
     var ability_conv = [1,2,3,4];
     var rarity_conv = ["Common","Uncommon","Rare","Epic","Fabled","Mythical","Legendary","Transcendent"];
-    var j = 0;
-    var items = [];
-    if(got_item ){
-        items[0] = ["the", "seed", "already", "changed", "cannot", "predict"];
-        j=1;
+    var num_abilities = 0;
+    var abilities = [];
+    var rarity = "";
+    var ability_levels = [];
+    var relic_level = 0;
+    var level_counter = 0;
+    var ability_choices = [];
+    var seed = s;
+
+    relic_level = level;
+
+    //find rarity    
+    seed = randNum(seed);
+    rarity =  rarity_conv[weightedChoice(rarity_odds,seed)];
+
+    //find num abilities
+    seed = randNum(seed);
+    num_abilities = relic_level === 1 ? 1 : ability_conv[weightedChoice(ability_odds[Math.max(0,4-relic_level)],seed)];
+
+    //find which abilities
+    for(var i=0;i<24;i++){
+        ability_choices[i] = i+1 > 22 ? i+2 : i+1;
     }
-    for (;j<zones.length;j++){
-       var num_abilities = 0;
-       var abilities = [];
-       var rarity = "";
-       var ability_levels = [];
-       var relic_level = 0;
-       var level_counter = 0;
-       var ability_choices = [];
-
-       relic_level = Math.ceil(Math.max(50*(1-Math.pow(1.2,(-zones[j]/100+1))),1));
-
-       //find rarity    
-       seed = randNum(seed);
-       rarity =  rarity_conv[weightedChoice(rarity_odds,seed)];
-
-       //find num abilities
-       seed = randNum(seed);
-       num_abilities = relic_level === 1 ? 1 : ability_conv[weightedChoice(ability_odds[Math.max(0,4-relic_level)],seed)];
-
-       //find which abilities
-       for(var i=0;i<24;i++){
-           ability_choices[i] = i+1 > 22 ? i+2 : i+1;
-       }
-       for(var i=0;i<num_abilities;i++){
-           var choice = 0;
-           seed = randNum(seed);
-           choice = seed % (24-i);
-           abilities[i] = ability_choices[choice];
-           ability_choices.splice(choice,1);
-
-       }
-
-       //find level of each ability
-       level_counter = relic_level;
-       for(var i=0;i<abilities.length-1;i++){
-           seed = randNum(seed);
-           ability_levels[i] = range(1,level_counter - (abilities.length - i) + 1,seed);
-           level_counter -= ability_levels[i];
-       }
-       ability_levels[abilities.length-1] = level_counter;
-
-       //Scale abilities as necessary
-       ability_levels.sort(sortNumbers);
-       for(var i=0;i<ability_levels.length;i++){
-           if(item_data[abilities[i]].scaling == "cubic"){
-               ability_levels[i] = Math.ceil(Math.pow(ability_levels[i],1/3));
-           }
-       }
-
-       //assemble item
-        items[j] = [relic_level, rarity,"-","-","-","-"];
-        for(var i=0;i<ability_levels.length;i++){
-            items[j][i+2] = applyLevelFormula(item_data[abilities[i]].effectDescription,
-                                item_data[abilities[i]].levelAmountFormula,
-                                ability_levels[i]);
-        }
+    for(var i=0;i<num_abilities;i++){
+        var choice = 0;
         seed = randNum(seed);
-   }
-   return items;
+        choice = seed % (24-i);
+        abilities[i] = ability_choices[choice];
+        ability_choices.splice(choice,1);
+
+    }
+
+    //find level of each ability
+    level_counter = relic_level;
+    for(var i=0;i<abilities.length-1;i++){
+        seed = randNum(seed);
+        ability_levels[i] = range(1,level_counter - (abilities.length - i) + 1,seed);
+        level_counter -= ability_levels[i];
+    }
+    ability_levels[abilities.length-1] = level_counter;
+    //Scale abilities as necessary
+    ability_levels.sort(sortNumbers);
+    for(var i=0;i<ability_levels.length;i++){
+        if(item_data[abilities[i]].scaling == "cubic"){
+            ability_levels[i] = Math.ceil(Math.pow(ability_levels[i],1/3));
+        }
+    }
+
+    //assemble item
+     var ab_arr = ["-","-","-","-"];
+     for(var i=0;i<ability_levels.length;i++){
+         ab_arr[i] = applyLevelFormula(item_data[abilities[i]].effectDescription,
+                             item_data[abilities[i]].levelAmountFormula,
+                             ability_levels[i]);
+     }
+     items.push([relic_level, rarity,ab_arr[0],ab_arr[1],ab_arr[2],ab_arr[3]]);
+     //item type (not stored but randomize to account for it)
+     seed = randNum(seed);
+
+     return seed;
 }
 function applyLevelFormula(e,formula,lvl)
 {

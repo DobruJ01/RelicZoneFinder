@@ -1,25 +1,35 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Relic Zone Finder</title>
+        <title>Relic Calculator</title>
         <script type="text/javascript" language="javascript" src="//code.jquery.com/jquery-1.11.1.min.js"></script>
         <script src="//crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/md5.js"></script>
 	<script type="text/javascript" language="javascript" src="//cdn.datatables.net/1.10.7/js/jquery.dataTables.min.js"></script>
         <link rel="stylesheet" href="//cdn.datatables.net/1.10.7/css/jquery.dataTables.css">
         <script type="text/javascript" src="js/dataTables.colResize.js"></script>
+        <link rel="stylesheet" href="CSS/stylesheet.css">
+        <script type="text/javascript" src='js/SpinBox.js'></script>
         <style>
-            body
-            {
+            html 
+            { 
                 background-color: #222222;
-                font-size: 20px;
+                background: url('img/CH bg - astral rift.png') no-repeat center center fixed; 
+                -webkit-background-size: cover;
+                -moz-background-size: cover;
+                -o-background-size: cover;
+                background-size: cover;
+                background-attachment: fixed;
+            }
+            .bg
+            {
+                width: 80%;
+                overflow: auto;
+                margin: auto;
             }
             .content_bg
             {
-                width: 80%;
-                background-color: #d3d3d3;
+                background: rgba(255,255,255,.8);
                 min-height: 1000px;
-                overflow: auto;
-                margin: auto;
                 padding-left: 10px;
                 padding-right: 10px;
                 padding-top: 10px;
@@ -31,55 +41,134 @@
             .loading{
                 background-image: url("img/spinner.gif");
                 background-repeat: no-repeat;
-                height:200px;
-                width:200px;
+                background-position: center;
+                display: none;
+                height:150px;
                 margin-left: auto;
                 margin-right: auto;
             }
             .tableDiv
             {
-                display:none;
-            }
-            .loading
-            {
-                display:none;
+                padding-top: 50px;
+                display:block;
             }
             .dataTables_wrapper { font-size: 14px }
             .result
             {
                 border-collapse: separate;
             }
+            .input
+            {
+                float: left;
+                font-size:20px;
+            }
+            .stats
+            {
+                float: right;
+                font-family: serif;
+                text-align: left;
+                font-size: 24px;
+                border: 1px solid;
+                height: 150px;
+                width: 300px;
+                background: rgba(255,255,255,.3);
+            }
+            .button
+            {
+                font-size: 14px;
+            }
+            .info
+            {
+                padding-top: 10px;
+                padding-left: 20px;
+                padding-bottom: 10px;
+                font-size:20px;
+            }
+            .spacer
+            {
+                clear:both;
+            }
+            .loadSave 
+            {
+                text-align:center;
+                vertical-align: middle;
+            }
+            .vertHelper
+            {
+                height: 100%;
+            }
+            #disclaimer
+            {
+                font-size:16px;
+                font-style: oblique;
+            }
         </style>
         
     </head>
     <body>
-
-        <div class="content_bg">
-            <textarea id="savedata" style="width: 500px; height: 50px" onfocus="this.select()" onmouseup="return false" placeholder="Paste save file here."></textarea>
-            <br>Zones to Display: 
-            <input type="text" id="numZones" value="5" style="width: 50px" onfocus="this.select()">
-            <br>
-            <button id="findZone">Generate Table</button>
-            <button id="createFile">Generate File</button>
-            <p id="spawnRange">Relic Spawn Range: </p>
-            <p id="ascension">Current Ascension: </p>
-            <p id="item">Load save file for results.</p>
-
-            <br>
-            <div class="tableDiv" id="tableHide">
-                <table class="display" id="result" width="100%"></table>
+        <div class="bg">
+            <div class='title'>
+                Relic Calculator
             </div>
-            <div class="loading" id="loadHide"></div>
+            <div class="content_bg">
+                <div class="top">
+                    <div class="input">
+                        <textarea id="savedata" style="width: 500px; height: 50px" onfocus="this.select()" onmouseup="return false" placeholder="Paste save file here."></textarea>
+                        <table id="spinboxes" style="cell-padding:2">
+                            <tr>
+                                <td>Zones to Display:</td>
+                                <td><span id="sbNumZones"></span></td>
+                            </tr>
+                            <tr>
+                                <td>Relics to Buy First:</td>
+                                <td><span id="sbRubyRelic"></span></td>
+                            </tr>
+                            <tr>
+                                <td>Ascensions:</td>
+                                <td><span id="sbAscension"></span></td>
+                            </tr>
+                        </table>
+                        <br>
+                        <button class="button" id="findZone">Generate Table</button>
+                        <button class="button" id="createFile">Generate File</button>
+                    </div>
+                    <div class="stats">
+                        <div class='statsData' id='statsData'>
+                            <div class="info" id="spawnRange"></div>
+                            <div class="info" id="ascension"></div>
+                            <div class="info" id="item"></div>
+                            <div class="loadSave">[Load save for results]</div>
+                        </div>
+                        <div class="loading" id="loadHide"></div>
+                    </div>
+                    
+                </div>
+                <div class='spacer'></div>
+                <div class="tableDiv" id="tableHide">
+                    <table class="display" id="result" width="100%"></table>
+                </div>
+                <br>
+                <br>
+                <div id='disclaimer'> Notes: <br>
+                    - Ascensions and relics with rubies are completely untested; I needed to push this version early to fix a bug.<br>
+                    - If your dream relic has suddenly changed, increase the level by one to get it back <br>
+                    - Special thanks to /u/Kaj_ for pointing out a very subtle bug.<br>
+                    - Last updated 9/13/2015
+                </div>
+            </div>
         </div>
 
 <script type="text/javascript">
         var timeout_id = null;
+        var sb_ruby_relic = new SpinBox(document.getElementById('sbRubyRelic'),{"step":3,"minimum":0});
+        var sb_num_zones = new SpinBox(document.getElementById('sbNumZones'),{"value":25,"step":25,"minimum":1});
+        var sb_ascensions = new SpinBox(document.getElementById('sbAscension'),{"step":1,"minimum":0});
         t = $('#result').DataTable({
             "ordering":true,
             "bPaginate":true,
             "iDisplayLength": 10,
             "searching":true,
-            "language":{"emptyTable":"Data is being populated"},
+            //"language":{"emptyTable":"Data is being populated"},
             "processing":true,
             "bScrollCollapse": true,
             "autowidth":false,
@@ -121,7 +210,9 @@ function findZones(write_to_file)
         alert("You need to ascend before getting relics.");
         return;
     }
-
+    if(document.getElementsByClassName("loadSave")[0] !== undefined){
+        document.getElementsByClassName("loadSave")[0].parentNode.removeChild(document.getElementsByClassName("loadSave")[0]);
+    }
     var zone_seed = data.items.bonusZoneRoller.seed;
     var ascension_seed = data.items.ascensionItemsRoller.seed;
     var HZE = data.highestFinishedZonePersist;
@@ -133,17 +224,10 @@ function findZones(write_to_file)
     var the_worker;
     var worker_data = undefined;
     
-    if(isNaN(document.getElementById("numZones").value)){
-        num_zones = 5;
-    }else{
-        num_zones = parseInt(document.getElementById("numZones").value);
-    }
-    
-    if(num_zones <0){
-        num_zones = 5;
-    }
+    num_zones = sb_num_zones.getValue();
+
     if(num_zones > 1500){
-        document.getElementById("tableHide").style.display="none";
+        document.getElementById("statsData").style.display="none";
         document.getElementById("loadHide").style.display="block";
     }
     //web worker for long calculation
@@ -155,7 +239,9 @@ function findZones(write_to_file)
     
     worker_data = {"SZ":start_zone,"HZE":HZE,"zoneSeed":zone_seed,"numZones":num_zones,
                    "ascensionSeed":ascension_seed,"itemReceived":item_received,
-                   "ascensions":data.numWorldResets,"writeToFile":write_to_file};
+                   "ascensions":data.numWorldResets,"writeToFile":write_to_file,
+                   "rubyRelic":sb_ruby_relic.getValue(),"ascensionsFirst":sb_ascensions.getValue(),
+                   "highestLevelItem":getHighestLevelItem(data)};
     //start worker
     the_worker.postMessage(worker_data);
     
@@ -164,11 +250,11 @@ function findZones(write_to_file)
         document.getElementById("loadHide").style.display="none";
         if(write_to_file){
             if(t.data().length > 0){
-                document.getElementById("tableHide").style.display="block";
+                document.getElementById("statsData").style.display="block";
             }
             downloadFile(event.data,num_zones);
         }else{
-            document.getElementById("tableHide").style.display="block";
+            document.getElementById("statsData").style.display="block";
             t.clear().draw();
             timeout_id = setTimeout(function(){
                 addRowsToTable(event.data,0);
@@ -228,7 +314,7 @@ function addRowsToTable(data,start)
 function findSpawnRange(start, HZE)
 {
     var tt;
-    var range = "Relic Spawn Range: ";
+    var range = "Spawn Range: ";
     tt = Math.ceil(HZE*.66);
     start += 1;
     
@@ -238,6 +324,20 @@ function findSpawnRange(start, HZE)
         range += start + "-" + tt;
     }
     return range;
+}
+function getHighestLevelItem(data)
+{
+    var highest = 0;
+    
+    for(var m in data.items.slots){
+        if(data.items.slots.hasOwnProperty(m)){
+            level = data.items.items[data.items.slots[m]].level;
+            if(level > highest){
+                highest = level;
+            }
+        }
+    }
+    return highest;
 }
 function findStartZone(data)
 {
