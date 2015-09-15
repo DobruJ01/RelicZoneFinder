@@ -1,0 +1,125 @@
+            html 
+            { 
+                background-color: #222222;
+                background: url('../img/CH bg - astral rift.png') no-repeat center center fixed; 
+                -webkit-background-size: cover;
+                -moz-background-size: cover;
+                -o-background-size: cover;
+                background-size: cover;
+                background-attachment: fixed;
+            }
+            .bg
+            {
+                width: 80%;
+                overflow: auto;
+                margin: auto;
+            }
+            .content_bg
+            {
+                background: rgba(255,255,255,.8);
+                min-height: 1000px;
+                padding-left: 10px;
+                padding-right: 10px;
+                padding-top: 10px;
+                padding-bottom: 10px;
+            }
+            p{
+                font-size: 20px;
+            }
+            .loading{
+                background-image: url("../img/spinner.gif");
+                background-repeat: no-repeat;
+                background-position: center;
+                display: none;
+                height:150px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+            .tableDiv
+            {
+                padding-top: 50px;
+                display:block;
+            }
+            .dataTables_wrapper { font-size: 14px }
+            .result
+            {
+                border-collapse: separate;
+            }
+            .input
+            {
+                float: left;
+                font-size:20px;
+            }
+            .stats
+            {
+                float: right;
+                font-family: serif;
+                text-align: left;
+                font-size: 24px;
+                border: 1px solid;
+                height: 150px;
+                width: 300px;
+                background: rgba(255,255,255,.3);
+            }
+            .button
+            {
+                font-size: 14px;
+            }
+            .info
+            {
+                padding-top: 10px;
+                padding-left: 20px;
+                padding-bottom: 10px;
+                font-size:20px;
+            }
+            .spacer
+            {
+                clear:both;
+            }
+            .loadSave 
+            {
+                text-align:center;
+                vertical-align: middle;
+            }
+            .vertHelper
+            {
+                height: 100%;
+            }
+            #disclaimer
+            {
+                font-size:16px;
+                font-style: oblique;
+            }
+            span.dropt span 
+            {
+                position: absolute; left: -9999px; top:100px;
+                font-size:14px;
+                margin: 20px 0 0 0px; padding: 3px 3px 3px 3px;
+                border-style:solid; border-color:black; border-width:1px; z-index:-6;
+            }
+            span.dropt:hover span {left: 2%; background: #ffffff;} 
+            span.dropt:hover span {margin: 20px 0 0 450px; background: #ffffff; z-index:6;} 
+            .title
+            {
+                font-size: 24px;
+                font-family: cursive;
+                color: rgb(0, 153, 51);
+            }
+            #baba
+            {
+                margin-left:20px;
+            }
+            #receivedImage
+            {
+                background-repeat: no-repeat; 
+                display:none;
+                width: 14px;
+                height: 14px;
+                float: left;
+                margin-top: 7px;
+            }
+            #ri
+            {
+                max-height: 14px;
+                max-width: 14px;
+            }

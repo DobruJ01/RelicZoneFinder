@@ -6,104 +6,10 @@
         <script src="//crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/md5.js"></script>
 	<script type="text/javascript" language="javascript" src="//cdn.datatables.net/1.10.7/js/jquery.dataTables.min.js"></script>
         <link rel="stylesheet" href="//cdn.datatables.net/1.10.7/css/jquery.dataTables.css">
+        <link rel='stylesheet' href='CSS/generalstylesheet.css'>
         <script type="text/javascript" src="js/dataTables.colResize.js"></script>
+        <script type="text/javascript" src='js/SpinBox.js'></script>    
         <link rel="stylesheet" href="CSS/stylesheet.css">
-        <script type="text/javascript" src='js/SpinBox.js'></script>
-        <style>
-            html 
-            { 
-                background-color: #222222;
-                background: url('img/CH bg - astral rift.png') no-repeat center center fixed; 
-                -webkit-background-size: cover;
-                -moz-background-size: cover;
-                -o-background-size: cover;
-                background-size: cover;
-                background-attachment: fixed;
-            }
-            .bg
-            {
-                width: 80%;
-                overflow: auto;
-                margin: auto;
-            }
-            .content_bg
-            {
-                background: rgba(255,255,255,.8);
-                min-height: 1000px;
-                padding-left: 10px;
-                padding-right: 10px;
-                padding-top: 10px;
-                padding-bottom: 10px;
-            }
-            p{
-                font-size: 20px;
-            }
-            .loading{
-                background-image: url("img/spinner.gif");
-                background-repeat: no-repeat;
-                background-position: center;
-                display: none;
-                height:150px;
-                margin-left: auto;
-                margin-right: auto;
-            }
-            .tableDiv
-            {
-                padding-top: 50px;
-                display:block;
-            }
-            .dataTables_wrapper { font-size: 14px }
-            .result
-            {
-                border-collapse: separate;
-            }
-            .input
-            {
-                float: left;
-                font-size:20px;
-            }
-            .stats
-            {
-                float: right;
-                font-family: serif;
-                text-align: left;
-                font-size: 24px;
-                border: 1px solid;
-                height: 150px;
-                width: 300px;
-                background: rgba(255,255,255,.3);
-            }
-            .button
-            {
-                font-size: 14px;
-            }
-            .info
-            {
-                padding-top: 10px;
-                padding-left: 20px;
-                padding-bottom: 10px;
-                font-size:20px;
-            }
-            .spacer
-            {
-                clear:both;
-            }
-            .loadSave 
-            {
-                text-align:center;
-                vertical-align: middle;
-            }
-            .vertHelper
-            {
-                height: 100%;
-            }
-            #disclaimer
-            {
-                font-size:16px;
-                font-style: oblique;
-            }
-        </style>
-        
     </head>
     <body>
         <div class="bg">
@@ -122,10 +28,22 @@
                             <tr>
                                 <td>Relics to Buy First:</td>
                                 <td><span id="sbRubyRelic"></span></td>
+                                <td>
+                                    <span class="dropt"><img src='img/info.png'>
+                                        <span style="width:250px;">
+                                        Purchasing relics with rubies can offset the seed by three and generate a completely different string of items. Adjust this value to see what would happen if you bought relics with rubies.</span>
+                                    </span>
+                                </td>
                             </tr>
                             <tr>
                                 <td>Ascensions:</td>
                                 <td><span id="sbAscension"></span></td>
+                                <td>
+                                    <span class="dropt"><img src='img/info.png'>
+                                        <span style="width:250px;">
+                                        Ascending without receiving a relic will make the spawn zone of the next item move to the current item. Adjust this value to see how ascending can affect the items.</span>
+                                    </span>
+                                </td>
                             </tr>
                         </table>
                         <br>
@@ -136,8 +54,12 @@
                         <div class='statsData' id='statsData'>
                             <div class="info" id="spawnRange"></div>
                             <div class="info" id="ascension"></div>
-                            <div class="info" id="item"></div>
+                            <div id='baba'>
+                                <span id='receivedImage'><img src='' id='ri'></span>
+                                <div class="info" id="item"></div>
+                            </div>
                             <div class="loadSave">[Load save for results]</div>
+                            
                         </div>
                         <div class="loading" id="loadHide"></div>
                     </div>
@@ -150,10 +72,10 @@
                 <br>
                 <br>
                 <div id='disclaimer'> Notes: <br>
-                    - Ascensions and relics with rubies are completely untested; I needed to push this version early to fix a bug.<br>
-                    - If your dream relic has suddenly changed, increase the level by one to get it back <br>
+                    - New features have been tested and seem to be working as intended. If you find a bug, please report it. You can find me on <a href="https://www.reddit.com/r/ClickerHeroes/comments/3ki9mf/relic_calculator/" target="_blank">this</a> thread.<br>
                     - Special thanks to /u/Kaj_ for pointing out a very subtle bug.<br>
-                    - Last updated 9/13/2015
+                    - If your dream relic has suddenly changed, increase the level by one to get it back <br>
+                    - Last updated 9/14/2015
                 </div>
             </div>
         </div>
@@ -168,7 +90,6 @@
             "bPaginate":true,
             "iDisplayLength": 10,
             "searching":true,
-            //"language":{"emptyTable":"Data is being populated"},
             "processing":true,
             "bScrollCollapse": true,
             "autowidth":false,
@@ -179,13 +100,13 @@
             },
             "columns": [
                     { "title": "Ascension", "class": "dt-head-left", "width":"5%"  },
-                    { "title": "Spawn Zone", "class": "dt-head-left"},
+                    { "title": "Spawn Zone", "class": "dt-head-left","width":"10%"},
                     { "title": "Level", "class": "dt-head-left", "width":"5%" },
                     { "title": "Rarity", "class": "dt-head-left", "width":"5%" },
-                    { "title": "Ability 1", "class": "dt-head-left" },
-                    { "title": "Ability 2", "class": "dt-head-left" },
-                    { "title": "Ability 3", "class": "dt-head-left" },
-                    { "title": "Ability 4", "class": "dt-head-left" }]
+                    { "title": "Ability 1", "class": "dt-head-left", "width":"18%" },
+                    { "title": "Ability 2", "class": "dt-head-left", "width":"18%" },
+                    { "title": "Ability 3", "class": "dt-head-left", "width":"18%" },
+                    { "title": "Ability 4", "class": "dt-head-left", "width":"18%" }]
             });
         $('#findZone').on( 'click', function () {
             clearTimeout(timeout_id);
@@ -210,9 +131,7 @@ function findZones(write_to_file)
         alert("You need to ascend before getting relics.");
         return;
     }
-    if(document.getElementsByClassName("loadSave")[0] !== undefined){
-        document.getElementsByClassName("loadSave")[0].parentNode.removeChild(document.getElementsByClassName("loadSave")[0]);
-    }
+
     var zone_seed = data.items.bonusZoneRoller.seed;
     var ascension_seed = data.items.ascensionItemsRoller.seed;
     var HZE = data.highestFinishedZonePersist;
@@ -226,13 +145,20 @@ function findZones(write_to_file)
     
     num_zones = sb_num_zones.getValue();
 
+    //Remove initial load data message
+    if(document.getElementsByClassName("loadSave")[0] !== undefined){
+        document.getElementsByClassName("loadSave")[0].parentNode.removeChild(document.getElementsByClassName("loadSave")[0]);
+    }
+    
     if(num_zones > 1500){
         document.getElementById("statsData").style.display="none";
         document.getElementById("loadHide").style.display="block";
     }
-    if(sb_ruby_relic.getValue()%3 !== 0){
+    
+    //Ensure relics are purchased in multiples of 3
+    if(sb_ruby_relic.getValue()%3 !==0)
         sb_ruby_relic.setValue(sb_ruby_relic.getValue() + (3-sb_ruby_relic.getValue()%3))
-    }
+    
     //web worker for long calculation
     if(the_worker !== undefined){
         the_worker.terminate();
@@ -245,6 +171,7 @@ function findZones(write_to_file)
                    "ascensions":data.numWorldResets,"writeToFile":write_to_file,
                    "rubyRelic":sb_ruby_relic.getValue(),"ascensionsFirst":sb_ascensions.getValue(),
                    "highestLevelItem":getHighestLevelItem(data)};
+    
     //start worker
     the_worker.postMessage(worker_data);
     
@@ -268,10 +195,13 @@ function findZones(write_to_file)
     });
 
     if(!write_to_file){
+        document.getElementById("receivedImage").style.display="block";
         if(JSON.stringify(data.items.gotAscensionItem) != "false"){
-            document.getElementById("item").innerHTML = "&#10004; Relic received!"; 
+            document.getElementById("ri").src = "img/relic received.png";
+            document.getElementById("item").innerHTML = "Relic received!";
         }else{
-            document.getElementById("item").innerHTML = "X Relic not received.";
+            document.getElementById("ri").src = "img/no relic.png";
+            document.getElementById("item").innerHTML = "Relic not received.";
         }
         document.getElementById("spawnRange").innerHTML = findSpawnRange(start_zone,HZE);
         document.getElementById("ascension").innerHTML = "Current Ascension: " + data.numWorldResets;

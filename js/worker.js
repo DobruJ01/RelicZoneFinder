@@ -5,8 +5,8 @@ self.addEventListener('message',  function(event)
     var results_table;
     var first_ascend = event.data.ascensionsFirst;
     var ascend_seed = event.data.zoneSeed;
-    //var relic_purchases = event.data.rubyRelic /3;
-    //Account for fake ascensions
+    
+    //Account for fake ascensions and ascensions from relics (each relic 'ascends' once)
     for(var i=0;i<first_ascend+event.data.rubyRelic;i++){
         ascend_seed = nextAscensionSeed(ascend_seed);
     }
@@ -15,9 +15,7 @@ self.addEventListener('message',  function(event)
     if(first_ascend>0){
         event.data.itemReceived = false;
     }
-//    for(var i=0;i<relic_purchases;i++){
-//        ascend_seed = nextAscensionSeed(ascend_seed);
-//    }
+    
     //find all spawn zones
     zones = findSeveralStartZones(event.data.SZ,event.data.HZE,ascend_seed,event.data.numZones);
     
@@ -54,7 +52,6 @@ function createTable(ascension_counter, zones, items,relics_purchased)
                 items[i][4],
                 items[i][5]]);
     }
-    console.log(items.length);
     for (var i=0; i<zones.length; i++) {
         dataset.push(
                 [i+ascension_counter,
@@ -119,7 +116,6 @@ function findItems(s, zones,got_item,relics_to_buy,HZE,highest_level_item)
     var j = 0;
     var items = [];
     var level;
-   console.log("relics to buy: " + relics_to_buy);
    
     //Relics bought with rubies
     for(var i=0;i<relics_to_buy;i++){
@@ -130,19 +126,17 @@ function findItems(s, zones,got_item,relics_to_buy,HZE,highest_level_item)
         level = range(Math.ceil(level*.75),level,seed);
         seed = generateItem(level,seed,items);
     }
-    console.log("items length:" + items.length);
     if(got_item ){
         items.push(["the", "seed", "already", "changed", "cannot", "predict"]);
         j=1;
     }
-    console.log("items length:" + items.length);
+
     //Relics from relic ooze
-    console.log("zones length: " + zones.length);
     for (;j<zones.length;j++){
         level = Math.ceil(Math.max(50*(1-Math.pow(1.2,(-(zones[j]-1)/100+1))),1));
         seed = generateItem(level,seed,items);
     }
-    console.log("items length:" + items.length);
+    
    return items;
 }
 function generateItem(level, s,items)
