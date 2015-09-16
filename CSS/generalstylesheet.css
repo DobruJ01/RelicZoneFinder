@@ -85,20 +85,11 @@
             {
                 height: 100%;
             }
-            #disclaimer
+            .disclaimer
             {
                 font-size:16px;
                 font-style: oblique;
             }
-            span.dropt span 
-            {
-                position: absolute; left: -9999px; top:100px;
-                font-size:14px;
-                margin: 20px 0 0 0px; padding: 3px 3px 3px 3px;
-                border-style:solid; border-color:black; border-width:1px; z-index:-6;
-            }
-            span.dropt:hover span {left: 2%; background: #ffffff;} 
-            span.dropt:hover span {margin: 20px 0 0 450px; background: #ffffff; z-index:6;} 
             .title
             {
                 font-size: 24px;
@@ -122,4 +113,23 @@
             {
                 max-height: 14px;
                 max-width: 14px;
+            }
+            .dropt 
+            {
+                text-decoration:none;
+                position:relative;
+            }
+            .dropt span 
+            {
+                display:none;
+            }
+            .dropt:hover span 
+            {
+                display:block;
+                font-size: 14px;
+                background: #ffffff; 
+                z-index:6;
+                border-style:solid; border-color:black; border-width:1px;
+                position:fixed;
+                overflow:hidden;
             }

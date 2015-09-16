@@ -18,10 +18,11 @@
                 <div class="top">
                     <div class="input">
                         <textarea id="savedata" style="width: 500px; height: 50px" onfocus="this.select()" onmouseup="return false" placeholder="Paste save file here."></textarea>
-                        <table id="spinboxes" style="cell-padding:2">
+                        <table id="spinboxes" style="cell-padding:4; cell-spacing: 10px">
                             <tr>
                                 <td>Zones to Display:</td>
                                 <td><span id="sbNumZones"></span></td>
+
                             </tr>
                             <tr>
                                 <td>Relics to Buy First:</td>
@@ -32,6 +33,13 @@
                                         Purchasing relics with rubies can offset the seed by three and generate a completely different string of items. Adjust this value to see what would happen if you bought relics with rubies.</span>
                                     </span>
                                 </td>
+                                <td>Highest Zone:</td>
+                                <td><span id="sbHZE"></span></td>
+                                <td>
+                                    <span class="dropt"><img src='img/info.png'>
+                                        <span style="width:250px;">
+                                        Increasing the highest zone ever will adjust the spawn range. Hence, the spawn zone and levels of the items will likewise change.</span>
+                                </td>
                             </tr>
                             <tr>
                                 <td>Ascensions:</td>
@@ -40,6 +48,14 @@
                                     <span class="dropt"><img src='img/info.png'>
                                         <span style="width:250px;">
                                         Ascending without receiving a relic will make the spawn zone of the next item move to the current item. Adjust this value to see how ascending can affect the items.</span>
+                                    </span>
+                                </td>
+                                <td>Iris:</td>
+                                <td><span id="sbIris"></span></td>
+                                <td>
+                                    <span class="dropt"><img src='img/info.png'>
+                                        <span style="width:250px;">
+                                        Increasing the starting zone will adjust the spawn range. Hence, the spawn zone and levels of the items will likewise change.</span>
                                     </span>
                                 </td>
                             </tr>
@@ -69,12 +85,21 @@
                 </div>
                 <br>
                 <br>
-                <div id='disclaimer'> Notes: <br>
+                <div>Calculator Info:<br>
+                    This calculator is designed to work with <a href="http://clickerheroes.com" target='_blank'>Clicker Heroes</a>, a wonderful game that you should go play right now.
+                </div>
+                <br>
+                <div class='disclaimer'> Warning: <br>
+                    The string of items calculated from purchased relics will differ each time a new item is received. If you see a future item you like, found from purchasing relics now, then buying those relics after receiving a relic ooze item will not guarantee the future item still exists.<br>
+                </div>
+                <br>
+                <div class='disclaimer'> Notes: <br>
+                    - Update: Added starting and highest zone functionality. <br>
                     - Update: Rarity now sorts on rarity value instead of alphabetically. <br>
                     - New features have been tested and seem to be working as intended. If you find a bug, please report it. You can find me on <a href="https://www.reddit.com/r/ClickerHeroes/comments/3ki9mf/relic_calculator/" target="_blank">this</a> thread.<br>
                     - Special thanks to /u/Kaj_ for pointing out a very subtle bug.<br>
                     - If your dream relic has suddenly changed, increase the level by one to get it back <br>
-                    - Last updated 9/15/2015
+                    - Last updated 9/16/2015
                 </div>
             </div>
         </div>
@@ -84,6 +109,20 @@
         var sb_ruby_relic = new SpinBox(document.getElementById('sbRubyRelic'),{"step":3,"minimum":0});
         var sb_num_zones = new SpinBox(document.getElementById('sbNumZones'),{"value":25,"step":25,"minimum":1});
         var sb_ascensions = new SpinBox(document.getElementById('sbAscension'),{"step":1,"minimum":0});
+        var sb_iris = new SpinBox(document.getElementById('sbIris'),{"step":5,"minimum":0});
+        var sb_hze = new SpinBox(document.getElementById('sbHZE'),{"step":5,"minimum":0});
+        var tooltips = document.querySelectorAll('.dropt span');
+
+        //Make tooltip follow mouse
+        window.onmousemove = function (e) {
+            var x = (e.clientX + 20) + 'px',
+                y = (e.clientY + 20) + 'px';
+            for (var i = 0; i < tooltips.length; i++) {
+                tooltips[i].style.top = y;
+                tooltips[i].style.left = x;
+            }
+        };
+
         t = $('#result').DataTable({
             "ordering":true,
             "bPaginate":true,
@@ -134,8 +173,8 @@ function findZones(write_to_file)
 
     var zone_seed = data.items.bonusZoneRoller.seed;
     var ascension_seed = data.items.ascensionItemsRoller.seed;
-    var HZE = data.highestFinishedZonePersist;
-    var start_zone = findStartZone(data);
+    var HZE = data.highestFinishedZonePersist + sb_hze.getValue();
+    var start_zone = findStartZone(data) + sb_iris.getValue();
     var spawn_zone = 0;
     var items;
     var num_zones = 1;
