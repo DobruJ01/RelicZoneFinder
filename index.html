@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Relic Calculator</title>
+        <title>Clicker Heroes Relic Calculator</title>
         <script type="text/javascript" language="javascript" src="//code.jquery.com/jquery-1.11.1.min.js"></script>
         <script src="//crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/md5.js"></script>
 	<script type="text/javascript" language="javascript" src="//cdn.datatables.net/1.10.7/js/jquery.dataTables.min.js"></script>
@@ -13,9 +13,7 @@
     </head>
     <body>
         <div class="bg">
-            <div class='title'>
-                Relic Calculator
-            </div>
+            <div class='title'>Relic Calculator</div>
             <div class="content_bg">
                 <div class="top">
                     <div class="input">
@@ -72,10 +70,11 @@
                 <br>
                 <br>
                 <div id='disclaimer'> Notes: <br>
+                    - Update: Rarity now sorts on rarity value instead of alphabetically. <br>
                     - New features have been tested and seem to be working as intended. If you find a bug, please report it. You can find me on <a href="https://www.reddit.com/r/ClickerHeroes/comments/3ki9mf/relic_calculator/" target="_blank">this</a> thread.<br>
                     - Special thanks to /u/Kaj_ for pointing out a very subtle bug.<br>
                     - If your dream relic has suddenly changed, increase the level by one to get it back <br>
-                    - Last updated 9/14/2015
+                    - Last updated 9/15/2015
                 </div>
             </div>
         </div>
@@ -102,11 +101,12 @@
                     { "title": "Ascension", "class": "dt-head-left", "width":"5%"  },
                     { "title": "Spawn Zone", "class": "dt-head-left","width":"10%"},
                     { "title": "Level", "class": "dt-head-left", "width":"5%" },
-                    { "title": "Rarity", "class": "dt-head-left", "width":"5%" },
+                    { "title": "Rarity", "class": "dt-head-left", "width":"5%","iDataSort":8 },
                     { "title": "Ability 1", "class": "dt-head-left", "width":"18%" },
                     { "title": "Ability 2", "class": "dt-head-left", "width":"18%" },
                     { "title": "Ability 3", "class": "dt-head-left", "width":"18%" },
-                    { "title": "Ability 4", "class": "dt-head-left", "width":"18%" }]
+                    { "title": "Ability 4", "class": "dt-head-left", "width":"18%" },
+                    { "title": "rarity_num", "bVisible":false }],
             });
         $('#findZone').on( 'click', function () {
             clearTimeout(timeout_id);

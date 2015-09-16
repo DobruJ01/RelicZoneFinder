@@ -24,7 +24,7 @@ self.addEventListener('message',  function(event)
     results_table = createTable(event.data.ascensions+first_ascend,zones, items,event.data.rubyRelic);
 
     if(event.data.writeToFile){
-        var csvRows = [['Ascension','Spawn Zone','Level','Rarity','Ability 1','Ability 2','Ability 3','Ability 4']];
+        var csvRows = [['Ascension','Spawn Zone','Level','Rarity','Ability 1','Ability 2','Ability 3','Ability 4','Rarity_num']];
         
         for(var i=0;i<results_table.length;++i){
             csvRows.push(results_table[i].join(','));
@@ -50,7 +50,8 @@ function createTable(ascension_counter, zones, items,relics_purchased)
                 items[i][2],
                 items[i][3],
                 items[i][4],
-                items[i][5]]);
+                items[i][5],
+                items[i][6]]);
     }
     for (var i=0; i<zones.length; i++) {
         dataset.push(
@@ -61,7 +62,8 @@ function createTable(ascension_counter, zones, items,relics_purchased)
                 items[i+relics_purchased][2],
                 items[i+relics_purchased][3],
                 items[i+relics_purchased][4],
-                items[i+relics_purchased][5]]);
+                items[i+relics_purchased][5],
+                items[i+relics_purchased][6]]);
     }
 
     return dataset;
@@ -127,7 +129,7 @@ function findItems(s, zones,got_item,relics_to_buy,HZE,highest_level_item)
         seed = generateItem(level,seed,items);
     }
     if(got_item ){
-        items.push(["the", "seed", "already", "changed", "cannot", "predict"]);
+        items.push(["the", "seed", "already", "changed", "cannot", "predict", 99]);
         j=1;
     }
 
@@ -158,7 +160,7 @@ function generateItem(level, s,items)
 
     //find rarity    
     seed = randNum(seed);
-    rarity =  rarity_conv[weightedChoice(rarity_odds,seed)];
+    rarity =  weightedChoice(rarity_odds,seed);
 
     //find num abilities
     seed = randNum(seed);
@@ -200,7 +202,7 @@ function generateItem(level, s,items)
                              item_data[abilities[i]].levelAmountFormula,
                              ability_levels[i]);
      }
-     items.push([relic_level, rarity,ab_arr[0],ab_arr[1],ab_arr[2],ab_arr[3]]);
+     items.push([relic_level, rarity_conv[rarity],ab_arr[0],ab_arr[1],ab_arr[2],ab_arr[3],rarity]);
      //item type (not stored but randomize to account for it)
      seed = randNum(seed);
 
