@@ -94,12 +94,13 @@
                 </div>
                 <br>
                 <div class='disclaimer'> Notes: <br>
+                    - Update: Major bug fixes for early game files - spawn zone display, relic purchases, level one item using seed one too many times. <br>
                     - Update: Added starting and highest zone functionality. <br>
                     - Update: Rarity now sorts on rarity value instead of alphabetically. <br>
                     - New features have been tested and seem to be working as intended. If you find a bug, please report it. You can find me on <a href="https://www.reddit.com/r/ClickerHeroes/comments/3ki9mf/relic_calculator/" target="_blank">this</a> thread.<br>
                     - Special thanks to /u/Kaj_ for pointing out a very subtle bug.<br>
                     - If your dream relic has suddenly changed, increase the level by one to get it back <br>
-                    - Last updated 9/16/2015
+                    - Last updated 9/18/2015
                 </div>
             </div>
         </div>
@@ -145,7 +146,8 @@
                     { "title": "Ability 2", "class": "dt-head-left", "width":"18%" },
                     { "title": "Ability 3", "class": "dt-head-left", "width":"18%" },
                     { "title": "Ability 4", "class": "dt-head-left", "width":"18%" },
-                    { "title": "rarity_num", "bVisible":false }],
+                    { "title": "rarity_num", "bVisible":false },
+                    { "title": "Rank_weight", "bVisible":false }],
             });
         $('#findZone').on( 'click', function () {
             clearTimeout(timeout_id);
@@ -156,10 +158,51 @@
         $('#createFile').on( 'click', function () {
             findZones(true);
         } );
-
+        //How to destroy table and start fresh
+//var table = $('#myTable').DataTable();
+// 
+//$('#submit').on( 'click', function () {
+//    $.getJSON( 'newTable', null, function ( json ) {
+//        table.destroy();
+//        $('#myTable').empty(); // empty in case the columns change
+// 
+//        table = $('#myTable').DataTable( {
+//            columns: json.columns,
+//            data:    json.rows
+//        } );
+//    } );
+//} );
 
 function findZones(write_to_file) 
 {
+    //Huh, it totally fucking works :O
+//    t.destroy();
+//    $('#result').empty();
+//    t = $('#result').DataTable({
+//            "ordering":true,
+//            "bPaginate":true,
+//            "iDisplayLength": 10,
+//            "searching":true,
+//            "processing":true,
+//            "bScrollCollapse": true,
+//            "autowidth":false,
+//            "bInfo" : true,
+//            "dom": 'Zlfrtip',
+//            "colResize": {
+//                "tableWidthFixed": true
+//            },
+//            "columns": [
+//                    { "title": "Ascension", "class": "dt-head-left", "width":"5%"  },
+//                    { "title": "Spawn Zone", "class": "dt-head-left","width":"10%"},
+//                    { "title": "Level", "class": "dt-head-left", "width":"5%" },
+//                    { "title": "Rarity", "class": "dt-head-left", "width":"5%","iDataSort":8 },
+//                    { "title": "Ability 1", "class": "dt-head-left", "width":"18%" },
+//                    { "title": "Ability 2", "class": "dt-head-left", "width":"18%" },
+//                    { "title": "Ability 3", "class": "dt-head-left", "width":"18%","iDataSort":9 },
+//                    { "title": "Ability 4", "class": "dt-head-left", "width":"18%" },
+//                    { "title": "rarity_num", "bVisible":false },
+//                    { "title": "Rank_weight", "bVisible":true }],
+//        });
     var data = decodeSaveData();
     var start_zones = new Array();
     var results_table;
@@ -291,9 +334,9 @@ function findSpawnRange(start, HZE)
     start += 1;
     
     if(tt - start <= Math.ceil(tt*.3)){
-        range += start + "-" + (start+Math.ceil(tt*.3));
+        range += Math.max(start,99) + "-" + Math.max((start+Math.ceil(tt*.3)),101);
     }else{
-        range += start + "-" + tt;
+        range += Math.max(start,99) + "-" + Math.max(tt,101);
     }
     return range;
 }

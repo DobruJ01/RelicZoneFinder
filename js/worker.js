@@ -24,7 +24,7 @@ self.addEventListener('message',  function(event)
     results_table = createTable(event.data.ascensions+first_ascend,zones, items,event.data.rubyRelic);
 
     if(event.data.writeToFile){
-        var csvRows = [['Ascension','Spawn Zone','Level','Rarity','Ability 1','Ability 2','Ability 3','Ability 4','Rarity_num']];
+        var csvRows = [['Ascension','Spawn Zone','Level','Rarity','Ability 1','Ability 2','Ability 3','Ability 4','Rarity_num','Quality Weight']];
         
         for(var i=0;i<results_table.length;++i){
             csvRows.push(results_table[i].join(','));
@@ -43,7 +43,7 @@ function createTable(ascension_counter, zones, items,relics_purchased)
     
     for(var i=0;i<relics_purchased;i++){
         dataset.push(
-                [i+1,
+                [0,
                 "purchased",
                 items[i][0],
                 items[i][1],
@@ -51,7 +51,8 @@ function createTable(ascension_counter, zones, items,relics_purchased)
                 items[i][3],
                 items[i][4],
                 items[i][5],
-                items[i][6]]);
+                items[i][6],
+                items[i][7]]);
     }
     for (var i=0; i<zones.length; i++) {
         dataset.push(
@@ -63,7 +64,8 @@ function createTable(ascension_counter, zones, items,relics_purchased)
                 items[i+relics_purchased][3],
                 items[i+relics_purchased][4],
                 items[i+relics_purchased][5],
-                items[i+relics_purchased][6]]);
+                items[i+relics_purchased][6],
+                items[i+relics_purchased][7]]);
     }
 
     return dataset;
@@ -127,9 +129,12 @@ function findItems(s, zones,got_item,relics_to_buy,HZE,highest_level_item)
         seed = randNum(seed);
         level = range(Math.ceil(level*.75),level,seed);
         seed = generateItem(level,seed,items);
+        if(level > highest_level_item){
+            highest_level_item = level;
+        }
     }
     if(got_item ){
-        items.push(["the", "seed", "already", "changed", "cannot", "predict", 99]);
+        items.push(["the", "seed", "already", "changed", "cannot", "predict", 99, 0]);
         j=1;
     }
 
@@ -163,13 +168,19 @@ function generateItem(level, s,items)
     rarity =  weightedChoice(rarity_odds,seed);
 
     //find num abilities
-    seed = randNum(seed);
-    num_abilities = relic_level === 1 ? 1 : ability_conv[weightedChoice(ability_odds[Math.max(0,4-relic_level)],seed)];
+    
+    if(relic_level == 1){
+        num_abilities = 1;
+    }else{
+        seed = randNum(seed);
+        num_abilities = ability_conv[weightedChoice(ability_odds[Math.max(0,4-relic_level)],seed)];
+    }
 
     //find which abilities
     for(var i=0;i<24;i++){
         ability_choices[i] = i+1 > 22 ? i+2 : i+1;
     }
+    //console.log(ability_choices);
     for(var i=0;i<num_abilities;i++){
         var choice = 0;
         seed = randNum(seed);
@@ -197,12 +208,18 @@ function generateItem(level, s,items)
 
     //assemble item
      var ab_arr = ["-","-","-","-"];
+     var points = 0;
      for(var i=0;i<ability_levels.length;i++){
+         var max_level = item_data[abilities[i]].maxLevel == "0" ? 50 : parseInt(item_data[abilities[i]].maxLevel);
+         if(max_level == 7){
+             max_level = 4;
+         }
+         points += item_points[abilities[i]]*(ability_levels[i]/max_level);
          ab_arr[i] = applyLevelFormula(item_data[abilities[i]].effectDescription,
                              item_data[abilities[i]].levelAmountFormula,
                              ability_levels[i]);
      }
-     items.push([relic_level, rarity_conv[rarity],ab_arr[0],ab_arr[1],ab_arr[2],ab_arr[3],rarity]);
+     items.push([relic_level, rarity_conv[rarity],ab_arr[0],ab_arr[1],ab_arr[2],ab_arr[3],rarity,points]);
      //item type (not stored but randomize to account for it)
      seed = randNum(seed);
 
@@ -252,8 +269,9 @@ function getBonusTypes()
 {
     return '{"itemBonusTypes":{"1":{"name":"Abandonment","levelAmountFormula":"linear10","effectDescription":"+%1% DPS when idle (no clicks for 60 seconds)","id":1,"maxLevel":0,"scaling":"linear"},"2":{"name":"Wrath","levelAmountFormula":"linear10","effectDescription":"+%1% Click Damage","id":2,"maxLevel":0,"scaling":"linear"},"3":{"name":"Time","levelAmountFormula":"linear5","effectDescription":"+%1 seconds to Boss Fight timers","id":3,"maxLevel":0,"scaling":"cubic"},"4":{"name":"Agitation","levelAmountFormula":"linear1","effectDescription":"+%1 seconds to duration of Clickstorm","id":4,"maxLevel":0,"scaling":"linear"},"5":{"name":"Luck","levelAmountFormula":"linear1","effectDescription":"+%1% Chance of double rubies from clickable treasures, when you get a ruby.","id":5,"maxLevel":7,"scaling":"cubic"},"6":{"name":"Vision","levelAmountFormula":"linear1","effectDescription":"+%1 to starting zone after Ascension","id":6,"maxLevel":0,"scaling":"cubic"},"7":{"name":"Enhancement","levelAmountFormula":"linear1","effectDescription":"+%1% to Gilded damage bonus (per Gild)","id":7,"maxLevel":0,"scaling":"linear"},"8":{"name":"Battery Life","levelAmountFormula":"linear1","effectDescription":"+%1 seconds to duration of Metal Detector","id":8,"maxLevel":0,"scaling":"linear"},"9":{"name":"Thieves","levelAmountFormula":"linear1","effectDescription":"+%1 seconds to duration of Golden Clicks","id":9,"maxLevel":0,"scaling":"linear"},"10":{"name":"Accuracy","levelAmountFormula":"linear1","effectDescription":"+%1 seconds to duration of Lucky Strikes","id":10,"maxLevel":0,"scaling":"linear"},"11":{"name":"Rage","levelAmountFormula":"linear1","effectDescription":"+%1 seconds to duration of Powersurge","id":11,"maxLevel":0,"scaling":"linear"},"12":{"name":"Wallops","levelAmountFormula":"linear1","effectDescription":"+%1 seconds to duration of Super Clicks","id":12,"maxLevel":0,"scaling":"linear"},"13":{"name":"Diseases","levelAmountFormula":"linear1","effectDescription":"-%1% Boss Life","id":13,"maxLevel":7,"scaling":"cubic"},"14":{"name":"Death","levelAmountFormula":"linear10","effectDescription":"+%1% to Hero Soul DPS (additive)","id":14,"maxLevel":0,"scaling":"linear"},"15":{"name":"Murder","levelAmountFormula":"linear1","effectDescription":"+%1% damage to Critical Clicks","id":15,"maxLevel":0,"scaling":"linear"},"16":{"name":"Discovery","levelAmountFormula":"linear10","effectDescription":"+%1% more Treasure Chests","id":16,"maxLevel":7,"scaling":"cubic"},"17":{"name":"Souls","levelAmountFormula":"linear1","effectDescription":"+%1% Chance of Primal Bosses","id":17,"maxLevel":7,"scaling":"cubic"},"18":{"name":"Chance","levelAmountFormula":"linear0_25","effectDescription":"+%1% Chance of 10x Gold","id":18,"maxLevel":7,"scaling":"cubic"},"19":{"name":"Thrift","levelAmountFormula":"linear1","effectDescription":"-%1% Hero Hiring and Level-Up cost","id":19,"maxLevel":7,"scaling":"cubic"},"20":{"name":"Wealth","levelAmountFormula":"linear15","effectDescription":"+%1% Gold from Golden Clicks","id":20,"maxLevel":0,"scaling":"linear"},"21":{"name":"Riches","levelAmountFormula":"linear25","effectDescription":"+%1% Gold From Treasure Chests","id":21,"maxLevel":0,"scaling":"linear"},"22":{"name":"Greed","levelAmountFormula":"linear5","effectDescription":"+%1% Gold Dropped","id":22,"maxLevel":0,"scaling":"linear"},"24":{"name":"Freedom","levelAmountFormula":"libAndSiy","effectDescription":"+%1% Gold gained from monsters when idle (no clicks for 60 seconds)","id":24,"maxLevel":0,"scaling":"linear"},"25":{"name":"Wisdom","levelAmountFormula":"solomonRewards","effectDescription":"+%1% Primal Hero Souls","id":25,"maxLevel":0,"scaling":"cubic"}}}';
 }
+var item_points = [0,1,5,5,5,50,1,40,70,1,1,1,90,1,5,1,100,5,80,0,0,1,1,1000000,60,1];
 var item_data = {
-    1:{"name":"Abandonment","levelAmountFormula":"linear10","effectDescription":"+%1% Idle DPS","id":1,"maxLevel":0,"scaling":"linear"},
+    1:{"name":"Abandonment","levelAmountFormula":"linear10","effectDescription":"+%1% Idle DPS","id":1,"maxLevel":0,"scaling":"linear"}, 
     2:{"name":"Wrath","levelAmountFormula":"linear10","effectDescription":"+%1% Click Damage","id":2,"maxLevel":0,"scaling":"linear"},
     3:{"name":"Time","levelAmountFormula":"linear5","effectDescription":"+%1 Sec Boss timers","id":3,"maxLevel":0,"scaling":"cubic"},
     4:{"name":"Agitation","levelAmountFormula":"linear1","effectDescription":"+%1 Sec Clickstorm","id":4,"maxLevel":0,"scaling":"linear"},
