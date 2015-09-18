@@ -217,7 +217,7 @@ function generateItem(level, s,items)
                              item_data[abilities[i]].levelAmountFormula,
                              ability_levels[i]);
      }
-     items.push([relic_level, rarity_conv[rarity],ab_arr[0],ab_arr[1],ab_arr[2],ab_arr[3],rarity,points]);
+     items.push([relic_level, rarity_conv[rarity],ab_arr[0],ab_arr[1],ab_arr[2],ab_arr[3],rarity]);
      //item type (not stored but randomize to account for it)
      seed = randNum(seed);
 
