@@ -8,7 +8,8 @@
         <link rel="stylesheet" href="//cdn.datatables.net/1.10.7/css/jquery.dataTables.css">
         <link rel='stylesheet' href='CSS/generalstylesheet.css'>
         <script type="text/javascript" src="js/dataTables.colResize.js"></script>
-        <script type="text/javascript" src='js/SpinBox.js'></script>    
+        <script type="text/javascript" src='js/SpinBox.js'></script> 
+        <script type="text/javascript" src="js/commonvars.js"></script>
         <link rel="stylesheet" href="CSS/stylesheet.css">
     </head>
     <body>
@@ -18,51 +19,88 @@
                 <div class="top">
                     <div class="input">
                         <textarea id="savedata" style="width: 500px; height: 50px" onfocus="this.select()" onmouseup="return false" placeholder="Paste save file here."></textarea>
-                        <table id="spinboxes" style="cell-padding:4; cell-spacing: 10px">
-                            <tr>
-                                <td>Zones to Display:</td>
-                                <td><span id="sbNumZones"></span></td>
+                        <!--div>
+                            <div id="changeInput">Open Exhaustive Search (beta)</div>
+                            <span class="dropt"><img src='img/info.png'>
+                                    <span style="width:250px;">
+                                    Increasing the highest zone ever will adjust the spawn range. Hence, the spawn zone and levels of the items will likewise change.</span>
+                            </span>
+                        </div-->
+                        <div id="listItems">
+                            <table id="spinboxes" style="cell-padding:4; cell-spacing: 10px">
+                                <tr>
+                                    <td>Zones to Display:</td>
+                                    <td><span id="sbNumZones"></span></td>
 
-                            </tr>
-                            <tr>
-                                <td>Relics to Buy First:</td>
-                                <td><span id="sbRubyRelic"></span></td>
-                                <td>
-                                    <span class="dropt"><img src='img/info.png'>
-                                        <span style="width:250px;">
-                                        Purchasing relics with rubies can offset the seed by three and generate a completely different string of items. Adjust this value to see what would happen if you bought relics with rubies.</span>
-                                    </span>
-                                </td>
-                                <td>Highest Zone:</td>
-                                <td><span id="sbHZE"></span></td>
-                                <td>
-                                    <span class="dropt"><img src='img/info.png'>
-                                        <span style="width:250px;">
-                                        Increasing the highest zone ever will adjust the spawn range. Hence, the spawn zone and levels of the items will likewise change.</span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Ascensions:</td>
-                                <td><span id="sbAscension"></span></td>
-                                <td>
-                                    <span class="dropt"><img src='img/info.png'>
-                                        <span style="width:250px;">
-                                        Ascending without receiving a relic will make the spawn zone of the next item move to the current item. Adjust this value to see how ascending can affect the items.</span>
-                                    </span>
-                                </td>
-                                <td>Iris:</td>
-                                <td><span id="sbIris"></span></td>
-                                <td>
-                                    <span class="dropt"><img src='img/info.png'>
-                                        <span style="width:250px;">
-                                        Increasing the starting zone will adjust the spawn range. Hence, the spawn zone and levels of the items will likewise change.</span>
-                                    </span>
-                                </td>
-                            </tr>
-                        </table>
-                        <br>
-                        <button class="button" id="findZone">Generate Table</button>
-                        <button class="button" id="createFile">Generate File</button>
+                                </tr>
+                                <tr>
+                                    <td>Relics to Buy First:</td>
+                                    <td><span id="sbRubyRelic"></span></td>
+                                    <td>
+                                        <span class="dropt"><img src='img/info.png'>
+                                            <span style="width:250px;">
+                                            Purchasing relics with rubies can offset the seed by three and generate a completely different string of items. Adjust this value to see what would happen if you bought relics with rubies.</span>
+                                        </span>
+                                    </td>
+                                    <td>Highest Zone:</td>
+                                    <td><span id="sbHZE"></span></td>
+                                    <td>
+                                        <span class="dropt"><img src='img/info.png'>
+                                            <span style="width:250px;">
+                                            Increasing the highest zone ever will adjust the spawn range. Hence, the spawn zone and levels of the items will likewise change.</span>
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Ascensions:</td>
+                                    <td><span id="sbAscension"></span></td>
+                                    <td>
+                                        <span class="dropt"><img src='img/info.png'>
+                                            <span style="width:250px;">
+                                            Ascending without receiving a relic will make the spawn zone of the next item move to the current item. Adjust this value to see how ascending can affect the items.</span>
+                                        </span>
+                                    </td>
+                                    <td>Iris:</td>
+                                    <td><span id="sbIris"></span></td>
+                                    <td>
+                                        <span class="dropt"><img src='img/info.png'>
+                                            <span style="width:250px;">
+                                            Increasing the starting zone will adjust the spawn range. Hence, the spawn zone and levels of the items will likewise change.</span>
+                                        </span>
+                                    </td>
+                                </tr>
+                            </table>
+                            <br>
+                            <button class="button" id="findZone">Generate Table</button>
+                            <button class="button" id="createFile">Generate File</button>
+                        </div> <!-- input div-->
+                        <div id='exhaustiveSearch'>
+                            <table>
+                                <tr>
+                                    <td>Min Rarity</td>
+                                    <td><div class="select-style"><select id='rarity'></select></div></td>
+                                </tr>
+                                <tr>
+                                    <td>Min Level</td>
+                                    <td><span id="sbMinLevel"></span></td>
+                                </tr>
+                                <tr>
+                                    <td>Max Relics</td>
+                                    <td><span id="sbMaxRelics"></span></td>
+                                </tr>
+                                <tr>
+                                    <!--td>Add constraint</td-->
+                                    <!--td></td>
+                                    <td></td-->
+                                    <td colspan="2"><button id='addProp'>Add Ability Constraint</button></td>
+                                </tr>
+                            </table>
+                            <table id='exhaustiveTable'>
+                                <tbody></tbody>
+                            </table>
+                            <button class="button" id="startSearch">Begin Search</button>
+                            <button class="button" id="abortSearch">Abort</button>
+                        </div>
                     </div>
                     <div class="stats">
                         <div class='statsData' id='statsData'>
@@ -106,57 +144,267 @@
         </div>
 
 <script type="text/javascript">
-        var timeout_id = null;
-        var sb_ruby_relic = new SpinBox(document.getElementById('sbRubyRelic'),{"step":3,"minimum":0});
-        var sb_num_zones = new SpinBox(document.getElementById('sbNumZones'),{"value":25,"step":25,"minimum":1});
-        var sb_ascensions = new SpinBox(document.getElementById('sbAscension'),{"step":1,"minimum":0});
-        var sb_iris = new SpinBox(document.getElementById('sbIris'),{"step":5,"minimum":0});
-        var sb_hze = new SpinBox(document.getElementById('sbHZE'),{"step":5,"minimum":0});
-        var tooltips = document.querySelectorAll('.dropt span');
+    var timeout_id = null;
+    var sb_ruby_relic = new SpinBox(document.getElementById('sbRubyRelic'),{"step":3,"minimum":0});
+    var sb_num_zones = new SpinBox(document.getElementById('sbNumZones'),{"value":25,"step":25,"minimum":1});
+    var sb_ascensions = new SpinBox(document.getElementById('sbAscension'),{"step":1,"minimum":0});
+    var sb_iris = new SpinBox(document.getElementById('sbIris'),{"step":5,"minimum":0});
+    var sb_hze = new SpinBox(document.getElementById('sbHZE'),{"step":5,"minimum":0});
+    var sb_min_level = new SpinBox(document.getElementById('sbMinLevel'),{"step":1,"minimum":0,"maximum":50});
+    var sb_max_relics = new SpinBox(document.getElementById('sbMaxRelics'),{"step":3,"minimum":0});
+    
+    var tooltips = document.querySelectorAll('.dropt span');
+    var row_ids = 0;
 
-        //Make tooltip follow mouse
-        window.onmousemove = function (e) {
-            var x = (e.clientX + 20) + 'px',
-                y = (e.clientY + 20) + 'px';
-            for (var i = 0; i < tooltips.length; i++) {
-                tooltips[i].style.top = y;
-                tooltips[i].style.left = x;
+    var rarity_conv = ["Common","Uncommon","Rare","Epic","Fabled","Mythical","Legendary","Transcendent"];
+    var item_props = ["Ability 1","Ability 2","Ability 3","Ability 4"];
+    //Add options for rarity
+    for(var i=0;i<rarity_conv.length;i++){
+        $("<option />", {value: i, text: rarity_conv[i]}).appendTo($('#rarity'));
+    }
+    $(function(){
+        $('#addProp').click().click().click().click();
+        var counter = 0;
+        $('.itemProp').each(function(){
+            this.value = counter;
+            this.text = item_props[counter];
+            counter++;
+        });
+    });
+    //Change input method
+    $('#changeInput').on('click',function(){
+        $('#listItems').toggle();
+        $('#exhaustiveSearch').toggle();
+        createExhaustiveTable();
+    });
+    //Remove
+    $(document).on('click', 'button.remove', function () { 
+        $(this).closest('tr').remove();
+        return false;
+    });
+    
+    //Duplicate
+    $(document).on('click', 'button.duplicate', function (event) { 
+        var row = $(this).closest('tr').clone(true,true);
+                $('#exhaustiveTable > tbody').after(row);
+        
+        var selects = $(this).closest('tr').find("select");
+	$(selects).each(function(i) {
+		var select = this;
+		$(row).find("select").eq(i).val($(select).val());
+	});
+        return true;
+    });
+    
+    //Add new row to table
+//    $(document).on('click', 'button.addProp', function () { 
+    $('#addProp').on('click', function () { //.eq(0).after
+        $('#exhaustiveTable > tbody').after('<tr><td><div class="select-style"><select class="itemProp"></select></div></td>\n\
+                                                          <td><div class="select-style"><select class="itemVal" id="' + row_ids + '"></select></div></td>\n\
+                                                          <td><div class="select-style"><select class="itemLevel" id="' + (row_ids + 1) +'"></select></div></td>\n\
+                                                          <td><button class="remove">Remove</button></td>\n\
+                                                          <td><button class="duplicate">Duplicate</button></td></tr>');  // class="itemVal" onChange="getSelectValue(this)"
+//$('#exhaustiveTable > tbody').eq(0).after('<tr><td><select class="itemProp"></select></td>\n\
+//                                                          <td><select class="itemVal" id="' + row_ids + '"></select></td>\n\
+//                                                          <td><select class="itemLevel" id="' + (row_ids + 1) +'"></select></td>\n\
+//                                                          <td><button class="remove">Remove</button></td>\n\
+//                                                          <td><button class="duplicate">Duplicate</button></td></tr>'); 
+        
+        
+        //On value change, update levels in section
+        $('.itemVal').on('change', function(event){
+            var curr_select = event.target.value;
+            var neighbor = $(this).parent().parent().siblings().children().find('select')[1];//.eq(1).children()[1]; //var neighbor = $(this).parent().siblings().children()[1];
+            //alert(JSON.stringify(neighbor.id));
+            var max_level = item_data[curr_select].scaling == "cubic" ? 4 : 50;
+            if(neighbor.options.length !== max_level){
+                $(neighbor).empty();
+                for(var i=0; i<max_level;i++){
+                    $("<option />", {value: i+1, text: 'Min lvl: ' + (i+1)}).appendTo($(neighbor));
+                }
             }
-        };
+        });
+        row_ids += 2;
+        var ROWINSERT = 0;
+        
+        //Populate Abilities
+        
+        //var a = document.getElementsByClassName("itemProp");
+        for (var i = 0; i < item_props.length; i++) {
+            $("<option />", {value: i, text: item_props[i]}).appendTo($(".itemProp")[ROWINSERT]);
+//            var option = document.createElement("option");
+//            option.setAttribute("value", i);
+//            option.text = item_props[i];
+//            a[ROWINSERT].appendChild(option);
+        }
+        
+        //Populate values
+        //var b = document.getElementsByClassName("itemVal");
+        for(var i in item_data){
+            $("<option />", {value: i, text: item_data[i].effectDescription.split("%1")[1]}).appendTo($(".itemVal")[ROWINSERT]);
+//            var option = document.createElement("option");
+//            option.setAttribute("value", i);
+//            option.text = item_data[i].name;
+//            b[ROWINSERT].appendChild(option);
+        }
 
-        t = $('#result').DataTable({
-            "ordering":true,
-            "bPaginate":true,
-            "iDisplayLength": 10,
-            "searching":true,
-            "processing":true,
-            "bScrollCollapse": true,
-            "autowidth":false,
-            "bInfo" : true,
-            "dom": 'Zlfrtip',
-            "colResize": {
-                "tableWidthFixed": true
-            },
-            "columns": [
-                    { "title": "Ascension", "class": "dt-head-left", "width":"5%"  },
-                    { "title": "Spawn Zone", "class": "dt-head-left","width":"10%"},
-                    { "title": "Level", "class": "dt-head-left", "width":"5%" },
-                    { "title": "Rarity", "class": "dt-head-left", "width":"5%","iDataSort":8 },
-                    { "title": "Ability 1", "class": "dt-head-left", "width":"18%" },
-                    { "title": "Ability 2", "class": "dt-head-left", "width":"18%" },
-                    { "title": "Ability 3", "class": "dt-head-left", "width":"18%" },
-                    { "title": "Ability 4", "class": "dt-head-left", "width":"18%" },
-                    { "title": "rarity_num", "bVisible":false }],
-            });
-        $('#findZone').on( 'click', function () {
-            clearTimeout(timeout_id);
-            timeout_id = null;
-            t.clear().draw();
-            findZones(false);
-        } );
-        $('#createFile').on( 'click', function () {
-            findZones(true);
-        } );
+        //Populate levels
+        var max_level = item_data[$('.itemVal')[ROWINSERT].value].maxLevel-3;  //item_data[document.getElementsByClassName("itemVal")[ROWINSERT].value].maxLevel-3;
+        //alert(max_level);
+        if(max_level < 0){
+            max_level = 50;
+        }
+        //var c = document.getElementsByClassName("itemLevel");
+            
+        for(var i = 0;i<max_level;i++){
+            $("<option />", {value: i+1, text: 'Min lvl: ' + (i+1)}).appendTo($(".itemLevel")[ROWINSERT]);
+//            var option = document.createElement("option");
+//            option.setAttribute("value", i+1);
+//            option.text = "Min lvl: " + (i+1);
+//            c[ROWINSERT].appendChild(option);
+        }
+        return false;
+    });
+    
+    //Make tooltip follow mouse
+    window.onmousemove = function (e) {
+        var x = (e.clientX + 20) + 'px',
+            y = (e.clientY + 20) + 'px';
+        for (var i = 0; i < tooltips.length; i++) {
+            tooltips[i].style.top = y;
+            tooltips[i].style.left = x;
+        }
+    };
+
+    //Create Data table
+    t = $('#result').DataTable({
+        "ordering":true,
+        "bPaginate":true,
+        "iDisplayLength": 10,
+        "searching":true,
+        "processing":true,
+        "bScrollCollapse": true,
+        "autowidth":false,
+        "bInfo" : true,
+        "dom": 'Zlfrtip',
+        "colResize": {
+            "tableWidthFixed": true
+        },
+        "columns": [
+                { "title": "Ascension", "class": "dt-head-left", "width":"5%"  },
+                { "title": "Spawn Zone", "class": "dt-head-left","width":"10%"},
+                { "title": "Level", "class": "dt-head-left", "width":"5%" },
+                { "title": "Rarity", "class": "dt-head-left", "width":"5%","iDataSort":8 },
+                { "title": "Ability 1", "class": "dt-head-left", "width":"18%" },
+                { "title": "Ability 2", "class": "dt-head-left", "width":"18%" },
+                { "title": "Ability 3", "class": "dt-head-left", "width":"18%" },
+                { "title": "Ability 4", "class": "dt-head-left", "width":"18%" },
+                { "title": "rarity_num", "bVisible":false }],
+        });
+    
+    //on click for create table
+    $('#findZone').on( 'click', function () {
+        clearTimeout(timeout_id);
+        timeout_id = null;
+        t.clear().draw();
+        findZones(false);
+    } );
+    
+    //For write to file (leave table in tact if exists)
+    $('#createFile').on( 'click', function () {
+        findZones(true);
+    } );
+    
+    //Exhaustive Search buttons
+    
+    //startSearch
+    $('#startSearch').on('click',function(){
+        //THIS IS IN DIRE NEED OF SOME DATA VALIDATION!!!!!
+        //itemProp, itemVal, itemLevel
+        var cons_holder = [];
+        var abilities = $('.itemProp')
+        var values = $('.itemVal');
+        var levels = $('.itemLevel');
+        var data = decodeSaveData();
+        if(!data){
+            return;
+        }
+        if(data.numWorldResets == 0){
+            alert("You need to ascend before getting relics.");
+            return;
+        }
+
+        var zone_seed = data.items.bonusZoneRoller.seed;
+        var ascension_seed = data.items.ascensionItemsRoller.seed;
+        var HZE = data.highestFinishedZonePersist;// + sb_hze.getValue();
+        //var start_zone = findStartZone(data) + sb_iris.getValue();
+        //var spawn_zone = 0;
+        //var items;
+        //var num_zones = 1;
+        var item_received = JSON.stringify(data.items.gotAscensionItem) != "false" ? true : false;
+        //var the_worker;
+        var worker_data = undefined;
+        for(var i=0;i<4;i++){
+            cons_holder[i]=[];
+        }
+        //alert(abilities[0].value);
+        
+        for(var i=0;i<abilities.length;i++){
+            cons_holder[abilities[i].value].push({"ability":values[i].value,"level":levels[i].value});
+
+            //alert(JSON.stringify(cons_holder));
+            
+        }
+        //alert(item_data[cons_holder[3][0].ability].name);
+        
+        
+        var exhaust_worker;
+        var worker_data;
+        
+        exhaust_worker = new Worker("js/exhaustWorker.js");
+    
+        worker_data = {"constraints":cons_holder,"level":50,"maxRelics":12,"zoneSeed":zone_seed,
+                   "ascensionSeed":ascension_seed,"itemReceived":item_received,"highestLevelItem":getHighestLevelItem(data),
+                   "minRarity":0,"HZE":HZE};
+
+        //start worker
+        exhaust_worker.postMessage(worker_data);
+
+        //handle response from worker
+        exhaust_worker.addEventListener('message', function(event){        
+            if(event.data =="complete"){
+                exhaust_worker.terminate();
+            }else{
+                //exhaust_worker.terminate();
+                var results = event.data;
+                //compile tracker
+                var counter = 0;
+                var tracker;
+                var pacer = 0;
+                //alert(JSON.stringify(results.item));
+                results.tracker.push(results.iterations);
+                
+                //Convert path array to string
+//                while(pacer < results.tracker.length){
+//                    while(pacer < results.tracker.length && results.tracker.length[pacer] > 0){
+//                        counter += results.tracker[pacer];
+//                        ++pacer;
+//                    }
+//                    tracker += "A" + counter;
+//                    counter = 0;
+//                    while(pacer < results.tracker.length && results.tracker.length[pacer] < 0){
+//                        counter += results.tracker[pacer];
+//                        ++pacer;
+//                    }
+//                    tracker += "R" + Math.abs(counter);
+//                    counter = 0;
+//                }
+                t.row.add(results.item).draw();
+                  //shouldn't really do this
+                //{"success":true,"item":item,"iterations":j,"purchased":false,"HLI":highest_level_item,"seed":s,"tracker":1}
+            }
+        });
+    });
         //How to destroy table and start fresh
 //var table = $('#myTable').DataTable();
 // 
@@ -171,7 +419,49 @@
 //        } );
 //    } );
 //} );
-
+//   how to trigger onclick event for rows
+//$(document).ready(function() {
+//    var table = $('#example').DataTable();
+//     
+//    $('#example tbody').on('click', 'tr', function () {
+//        var data = table.row( this ).data();
+//        alert( 'You clicked on '+data[0]+'\'s row' );
+//    } );
+//} );
+//function getSelectValue(sel)
+//{
+//    var value = sel;
+//    
+//    alert(JSON.stringify(sel));
+//    //$(this).closest('select').remove();
+//}
+function createExhaustiveTable()
+{
+    t.destroy();
+    $('#result').empty();
+    t = $('#result').DataTable({
+            "ordering":true,
+            "bPaginate":true,
+            "iDisplayLength": 10,
+            "searching":true,
+            "processing":true,
+            "bScrollCollapse": true,
+            "autowidth":false,
+            "bInfo" : true,
+            "dom": 'Zlfrtip',
+            "colResize": {
+                "tableWidthFixed": true
+            },
+            "columns": [
+                    { "title": "Level", "class": "dt-head-left", "width":"5%" },
+                    { "title": "Rarity", "class": "dt-head-left", "width":"5%","iDataSort":8 },
+                    { "title": "Ability 1", "class": "dt-head-left", "width":"18%" },
+                    { "title": "Ability 2", "class": "dt-head-left", "width":"18%" },
+                    { "title": "Ability 3", "class": "dt-head-left", "width":"18%","iDataSort":9 },
+                    { "title": "Ability 4", "class": "dt-head-left", "width":"18%" },
+                    { "title": "rarity_num", "bVisible":true }],
+        });
+}
 function findZones(write_to_file) 
 {
 //    t.destroy();
@@ -226,13 +516,13 @@ function findZones(write_to_file)
     num_zones = sb_num_zones.getValue();
 
     //Remove initial load data message
-    if(document.getElementsByClassName("loadSave")[0] !== undefined){
-        document.getElementsByClassName("loadSave")[0].parentNode.removeChild(document.getElementsByClassName("loadSave")[0]);
+    if($(".loadSave").length){
+        $(".loadSave").remove();
     }
     
     if(num_zones > 1500){
-        document.getElementById("statsData").style.display="none";
-        document.getElementById("loadHide").style.display="block";
+        $("#statsData").hide();
+        $("#loadHide").show();
     }
     
     //Ensure relics are purchased in multiples of 3
@@ -257,14 +547,14 @@ function findZones(write_to_file)
     
     //handle response from worker
     the_worker.addEventListener('message', function(event){        
-        document.getElementById("loadHide").style.display="none";
+        $("#loadHide").hide();
         if(write_to_file){
             if(t.data().length > 0){
-                document.getElementById("statsData").style.display="block";
+                $("#statsData").show();
             }
             downloadFile(event.data,num_zones);
         }else{
-            document.getElementById("statsData").style.display="block";
+            $("#statsData").show();
             t.clear().draw();
             timeout_id = setTimeout(function(){
                 addRowsToTable(event.data,0);
@@ -275,16 +565,16 @@ function findZones(write_to_file)
     });
 
     if(!write_to_file){
-        document.getElementById("receivedImage").style.display="block";
+        $("#receivedImage").show();
         if(JSON.stringify(data.items.gotAscensionItem) != "false"){
-            document.getElementById("ri").src = "img/relic received.png";
-            document.getElementById("item").innerHTML = "Relic received!";
+            $("#ri").attr('src',"img/relic received.png");
+            $("#item").html("Relic received!");
         }else{
-            document.getElementById("ri").src = "img/no relic.png";
-            document.getElementById("item").innerHTML = "Relic not received.";
+            $("#ri").attr('src',"img/no relic.png")
+            $("#item").html("Relic not received.");
         }
-        document.getElementById("spawnRange").innerHTML = findSpawnRange(start_zone,HZE);
-        document.getElementById("ascension").innerHTML = "Current Ascension: " + data.numWorldResets;
+        $("#spawnRange").html(findSpawnRange(start_zone,HZE));
+        $("#ascension").html("Current Ascension: " + data.numWorldResets);
     }
 }
 function downloadFile(data, num_zones)
@@ -359,12 +649,13 @@ function findStartZone(data)
     var the_item;
     var start_zone = 0;
     //check for items that increase starting zone
-    for(var m in data.items.slots){
+    for(var m=1;m<5;m++){
         if(data.items.slots.hasOwnProperty(m)){
             the_item = data.items.items[data.items.slots[m]];
-            for (var j=0; j<4; j++) {
+            for (var j=1; j<5; j++) {
                 var str = "bonusType" + j.toString();
-                if(the_item[str] == VISION_RELIC) {
+                //alert(the_item[str] + " " + VISION_RELIC);
+                if(the_item[str] === VISION_RELIC) {
                     start_zone += the_item["bonus" + j.toString() + "Level"]
                 }
             }
@@ -406,6 +697,7 @@ function decodeSaveData()
     alert("Not a valid save file");
     return;
 }
+
 </script>
 
 </body>

@@ -50,6 +50,55 @@
                 float: left;
                 font-size:20px;
             }
+            .select-style {
+                padding: 0;
+                margin: 0;
+                border: 1 px solid #ccc;
+                width: 120px;
+                border-radius: 1px;
+                overflow: hidden;
+                background-color: #fff;
+
+                background: #fff url("http://www.scottgood.com/jsg/blog.nsf/images/arrowdown.gif") no-repeat 90% 50%;
+            }
+
+            .select-style select {
+                padding: 2px 4px;
+                width: 130%;
+                border: none;
+                box-shadow: none;
+                background-color: transparent;
+                background-image: none;
+                -webkit-appearance: none;
+                   -moz-appearance: none;
+                        appearance: none;
+            }
+
+            .select-style select:focus {
+                outline: none;
+            }
+            .itemLevel
+            {
+                width: 100px;
+                
+            }
+            #changeInput
+            {
+                font-size: 12px;
+                float: left;
+                text-decoration: underline;
+                color: blue;
+                padding: 5px;
+            }
+            #changeInput:hover
+            {
+                cursor: pointer;
+                cursor: hand;
+            }
+            #exhaustiveSearch
+            {
+                display: none;
+            }
             .stats
             {
                 float: right;
