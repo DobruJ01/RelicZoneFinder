@@ -19,19 +19,18 @@
                 <div class="top">
                     <div class="input">
                         <textarea id="savedata" style="width: 500px; height: 50px" onfocus="this.select()" onmouseup="return false" placeholder="Paste save file here."></textarea>
-                        <!--div>
-                            <div id="changeInput">Open Exhaustive Search (beta)</div>
+                        <div>
+                            <!--div id="changeInput">Open Exhaustive Search (beta)</div>
                             <span class="dropt"><img src='img/info.png'>
                                     <span style="width:250px;">
                                     Increasing the highest zone ever will adjust the spawn range. Hence, the spawn zone and levels of the items will likewise change.</span>
-                            </span>
-                        </div-->
+                            </span-->
+                        </div>
                         <div id="listItems">
                             <table id="spinboxes" style="cell-padding:4; cell-spacing: 10px">
                                 <tr>
                                     <td>Zones to Display:</td>
                                     <td><span id="sbNumZones"></span></td>
-
                                 </tr>
                                 <tr>
                                     <td>Relics to Buy First:</td>
@@ -89,9 +88,6 @@
                                     <td><span id="sbMaxRelics"></span></td>
                                 </tr>
                                 <tr>
-                                    <!--td>Add constraint</td-->
-                                    <!--td></td>
-                                    <td></td-->
                                     <td colspan="2"><button id='addProp'>Add Ability Constraint</button></td>
                                 </tr>
                             </table>
@@ -175,15 +171,22 @@
     $('#changeInput').on('click',function(){
         $('#listItems').toggle();
         $('#exhaustiveSearch').toggle();
-        createExhaustiveTable();
+        
+        //Clear old table
+        t.destroy();
+        $('#result').empty();
+        if($('#listItems').is(":visible"))
+            createStandardTable();
+        else
+            createExhaustiveTable();
     });
-    //Remove
+    //Remove (constraint button)
     $(document).on('click', 'button.remove', function () { 
         $(this).closest('tr').remove();
         return false;
     });
     
-    //Duplicate
+    //Duplicate (constraint button)
     $(document).on('click', 'button.duplicate', function (event) { 
         var row = $(this).closest('tr').clone(true,true);
                 $('#exhaustiveTable > tbody').after(row);
@@ -197,24 +200,17 @@
     });
     
     //Add new row to table
-//    $(document).on('click', 'button.addProp', function () { 
     $('#addProp').on('click', function () { //.eq(0).after
         $('#exhaustiveTable > tbody').after('<tr><td><div class="select-style"><select class="itemProp"></select></div></td>\n\
                                                           <td><div class="select-style"><select class="itemVal" id="' + row_ids + '"></select></div></td>\n\
                                                           <td><div class="select-style"><select class="itemLevel" id="' + (row_ids + 1) +'"></select></div></td>\n\
                                                           <td><button class="remove">Remove</button></td>\n\
-                                                          <td><button class="duplicate">Duplicate</button></td></tr>');  // class="itemVal" onChange="getSelectValue(this)"
-//$('#exhaustiveTable > tbody').eq(0).after('<tr><td><select class="itemProp"></select></td>\n\
-//                                                          <td><select class="itemVal" id="' + row_ids + '"></select></td>\n\
-//                                                          <td><select class="itemLevel" id="' + (row_ids + 1) +'"></select></td>\n\
-//                                                          <td><button class="remove">Remove</button></td>\n\
-//                                                          <td><button class="duplicate">Duplicate</button></td></tr>'); 
-        
+                                                          <td><button class="duplicate">Duplicate</button></td></tr>');
         
         //On value change, update levels in section
         $('.itemVal').on('change', function(event){
             var curr_select = event.target.value;
-            var neighbor = $(this).parent().parent().siblings().children().find('select')[1];//.eq(1).children()[1]; //var neighbor = $(this).parent().siblings().children()[1];
+            var neighbor = $(this).parent().parent().siblings().children().find('select')[1];
             //alert(JSON.stringify(neighbor.id));
             var max_level = item_data[curr_select].scaling == "cubic" ? 4 : 50;
             if(neighbor.options.length !== max_level){
@@ -228,41 +224,21 @@
         var ROWINSERT = 0;
         
         //Populate Abilities
-        
-        //var a = document.getElementsByClassName("itemProp");
-        for (var i = 0; i < item_props.length; i++) {
+        for (var i = 0; i < item_props.length; i++) 
             $("<option />", {value: i, text: item_props[i]}).appendTo($(".itemProp")[ROWINSERT]);
-//            var option = document.createElement("option");
-//            option.setAttribute("value", i);
-//            option.text = item_props[i];
-//            a[ROWINSERT].appendChild(option);
-        }
         
         //Populate values
-        //var b = document.getElementsByClassName("itemVal");
-        for(var i in item_data){
+        for(var i in item_data)
             $("<option />", {value: i, text: item_data[i].effectDescription.split("%1")[1]}).appendTo($(".itemVal")[ROWINSERT]);
-//            var option = document.createElement("option");
-//            option.setAttribute("value", i);
-//            option.text = item_data[i].name;
-//            b[ROWINSERT].appendChild(option);
-        }
 
         //Populate levels
-        var max_level = item_data[$('.itemVal')[ROWINSERT].value].maxLevel-3;  //item_data[document.getElementsByClassName("itemVal")[ROWINSERT].value].maxLevel-3;
-        //alert(max_level);
-        if(max_level < 0){
+        var max_level = item_data[$('.itemVal')[ROWINSERT].value].maxLevel-3;
+        if(max_level < 0)
             max_level = 50;
-        }
-        //var c = document.getElementsByClassName("itemLevel");
-            
-        for(var i = 0;i<max_level;i++){
+        
+        for(var i = 0;i<max_level;i++)
             $("<option />", {value: i+1, text: 'Min lvl: ' + (i+1)}).appendTo($(".itemLevel")[ROWINSERT]);
-//            var option = document.createElement("option");
-//            option.setAttribute("value", i+1);
-//            option.text = "Min lvl: " + (i+1);
-//            c[ROWINSERT].appendChild(option);
-        }
+
         return false;
     });
     
@@ -277,30 +253,7 @@
     };
 
     //Create Data table
-    t = $('#result').DataTable({
-        "ordering":true,
-        "bPaginate":true,
-        "iDisplayLength": 10,
-        "searching":true,
-        "processing":true,
-        "bScrollCollapse": true,
-        "autowidth":false,
-        "bInfo" : true,
-        "dom": 'Zlfrtip',
-        "colResize": {
-            "tableWidthFixed": true
-        },
-        "columns": [
-                { "title": "Ascension", "class": "dt-head-left", "width":"5%"  },
-                { "title": "Spawn Zone", "class": "dt-head-left","width":"10%"},
-                { "title": "Level", "class": "dt-head-left", "width":"5%" },
-                { "title": "Rarity", "class": "dt-head-left", "width":"5%","iDataSort":8 },
-                { "title": "Ability 1", "class": "dt-head-left", "width":"18%" },
-                { "title": "Ability 2", "class": "dt-head-left", "width":"18%" },
-                { "title": "Ability 3", "class": "dt-head-left", "width":"18%" },
-                { "title": "Ability 4", "class": "dt-head-left", "width":"18%" },
-                { "title": "rarity_num", "bVisible":false }],
-        });
+    createStandardTable();
     
     //on click for create table
     $('#findZone').on( 'click', function () {
@@ -310,7 +263,7 @@
         findZones(false);
     } );
     
-    //For write to file (leave table in tact if exists)
+    //For write to file (leave table intact if exists)
     $('#createFile').on( 'click', function () {
         findZones(true);
     } );
@@ -375,14 +328,13 @@
             if(event.data =="complete"){
                 exhaust_worker.terminate();
             }else{
-                //exhaust_worker.terminate();
                 var results = event.data;
                 //compile tracker
                 var counter = 0;
                 var tracker;
                 var pacer = 0;
                 //alert(JSON.stringify(results.item));
-                results.tracker.push(results.iterations);
+                //results.tracker.push(results.iterations);
                 
                 //Convert path array to string
 //                while(pacer < results.tracker.length){
@@ -400,7 +352,6 @@
 //                    counter = 0;
 //                }
                 t.row.add(results.item).draw();
-                  //shouldn't really do this
                 //{"success":true,"item":item,"iterations":j,"purchased":false,"HLI":highest_level_item,"seed":s,"tracker":1}
             }
         });
@@ -437,7 +388,6 @@
 //}
 function createExhaustiveTable()
 {
-    t.destroy();
     $('#result').empty();
     t = $('#result').DataTable({
             "ordering":true,
@@ -462,35 +412,36 @@ function createExhaustiveTable()
                     { "title": "rarity_num", "bVisible":true }],
         });
 }
+function createStandardTable()
+{
+    t = $('#result').DataTable({
+        "ordering":true,
+        "bPaginate":true,
+        "iDisplayLength": 10,
+        "searching":true,
+        "processing":true,
+        "bScrollCollapse": true,
+        "autowidth":false,
+        "bInfo" : true,
+        "dom": 'Zlfrtip',
+        "colResize": {
+            "tableWidthFixed": true
+        },
+        "columns": [
+                { "title": "Ascension", "class": "dt-head-left", "width":"5%"  },
+                { "title": "Spawn Zone", "class": "dt-head-left","width":"10%"},
+                { "title": "Level", "class": "dt-head-left", "width":"5%" },
+                { "title": "Rarity", "class": "dt-head-left", "width":"5%","iDataSort":8 },
+                { "title": "Ability 1", "class": "dt-head-left", "width":"18%" },
+                { "title": "Ability 2", "class": "dt-head-left", "width":"18%" },
+                { "title": "Ability 3", "class": "dt-head-left", "width":"18%" },
+                { "title": "Ability 4", "class": "dt-head-left", "width":"18%" },
+                { "title": "rarity_num", "bVisible":false }],
+        });
+    
+}
 function findZones(write_to_file) 
 {
-//    t.destroy();
-//    $('#result').empty();
-//    t = $('#result').DataTable({
-//            "ordering":true,
-//            "bPaginate":true,
-//            "iDisplayLength": 10,
-//            "searching":true,
-//            "processing":true,
-//            "bScrollCollapse": true,
-//            "autowidth":false,
-//            "bInfo" : true,
-//            "dom": 'Zlfrtip',
-//            "colResize": {
-//                "tableWidthFixed": true
-//            },
-//            "columns": [
-//                    { "title": "Ascension", "class": "dt-head-left", "width":"5%"  },
-//                    { "title": "Spawn Zone", "class": "dt-head-left","width":"10%"},
-//                    { "title": "Level", "class": "dt-head-left", "width":"5%" },
-//                    { "title": "Rarity", "class": "dt-head-left", "width":"5%","iDataSort":8 },
-//                    { "title": "Ability 1", "class": "dt-head-left", "width":"18%" },
-//                    { "title": "Ability 2", "class": "dt-head-left", "width":"18%" },
-//                    { "title": "Ability 3", "class": "dt-head-left", "width":"18%","iDataSort":9 },
-//                    { "title": "Ability 4", "class": "dt-head-left", "width":"18%" },
-//                    { "title": "rarity_num", "bVisible":false },
-//                    { "title": "Rank_weight", "bVisible":true }],
-//        });
     var data = decodeSaveData();
     var start_zones = new Array();
     var results_table;
@@ -654,7 +605,6 @@ function findStartZone(data)
             the_item = data.items.items[data.items.slots[m]];
             for (var j=1; j<5; j++) {
                 var str = "bonusType" + j.toString();
-                //alert(the_item[str] + " " + VISION_RELIC);
                 if(the_item[str] === VISION_RELIC) {
                     start_zone += the_item["bonus" + j.toString() + "Level"]
                 }

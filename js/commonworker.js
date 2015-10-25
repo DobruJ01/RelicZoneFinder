@@ -202,11 +202,6 @@ function convertRawItemToPretty(item_list)
     var ab_arr = ["-","-","-","-"];
     
     for(var i=0;i<abilities.length;i++){
-//        var max_level = item_data[abilities[i]].maxLevel == "0" ? 50 : parseInt(item_data[abilities[i]].maxLevel);
-//        if(max_level == 7){
-//            max_level = 4;
-//        }
-        //points += item_points[abilities[i]]*(ability_levels[i]/max_level);
         ab_arr[i] = applyLevelFormula(item_data[abilities[i]].effectDescription,
                             item_data[abilities[i]].levelAmountFormula,
                             ability_levels[i]);
